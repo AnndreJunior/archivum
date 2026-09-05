@@ -1,0 +1,9 @@
+﻿services:
+  archivum.web:
+    container_name: archivum.web
+    image: archivum.web
+    build:
+      context: .
+      dockerfile: src/Web/Dockerfile
+    ports:
+      - "8080:8080"
