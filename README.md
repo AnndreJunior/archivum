@@ -23,5 +23,20 @@ Sistema de gestão para bibliotecas escolares desenvolvido para simplificar o co
 - **Banco de dados:** PostgreSQL
 - **Containers:** Docker & Docker Compose
 
+## 🏃‍➡️ Como executar
+
+Clone o projeto
+```bash
+git clone https://github.com/AnndreJunior/Archivum.git
+cd Archivum
+```
+
+Execute via docker compose
+```bash
+docker compose up -d
+```
+
+Acesse a aplicação em http://localhost:8080. Para acessar os logs entre em http://localhost:5341.
+
 ---
 *Este repositório está em desenvolvimento ativo. Atualizações frequentes serão enviadas via commits.*
