@@ -5,4 +5,11 @@
     <File Path="README.md" />
       <File Path=".editorconfig" />
   </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Web/Web.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/IntegrationTests/IntegrationTests.csproj" />
+    <Project Path="test/UnitTests/UnitTests.csproj" />
+  </Folder>
 </Solution>
