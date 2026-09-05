@@ -5,5 +5,58 @@
     build:
       context: .
       dockerfile: src/Web/Dockerfile
+    environment:
+      - CONNECTIONSTRINGS__POSTGRES=Server=archivum.web;Port=5432;Database=archivum;User Id=admin;Password=admin;
     ports:
       - "8080:8080"
+    depends_on:
+      archivum.db:
+        condition: service_healthy
+      archivum.seq:
+        condition: service_started
+      archivum.smtp:
+        condition: service_started
+    
+  archivum.db:
+    container_name: archivum.db
+    image: postgres:18
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=archivum
+    ports:
+      - "5432:5432"
+    volumes:
+      - archivum_pgdata:/var/lib/postgresql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+  
+  archivum.seq:
+    container_name: archivum.seq
+    image: datalust/seq:latest
+    restart: unless-stopped
+    environment:
+      - ACCEPT_EULA=Y
+      - SEQ_FIRSTRUN_NOAUTHENTICATION=True
+    ports:
+      - "5341:80"
+    volumes:
+      - seq_data:/data
+  
+  archivum.smtp:
+    container_name: archivum.smtp
+    image: rnwood/smtp4dev
+    ports:
+      - "3000:80"
+      - "2525:25"
+    volumes:
+      - smtp4dev_data:/smtp4dev
+
+volumes:
+  archivum_pgdata:
+  seq_data:
+  smtp4dev_data:
