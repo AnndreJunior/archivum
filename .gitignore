@@ -427,3 +427,9 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# JetBrains Rider / ReSharper
+.idea/
+*.sln.iml
+_ReSharper.*/
+*.DotSettings.user
