@@ -1,0 +1,60 @@
+name: CD - Deploy
+
+# Job 1: publica a imagem no Docker Hub
+# Job 2: notifica o deploy hook do Render
+#
+# Para testar com act sem publicar no Docker Hub nem notificar o Render:
+#   act --env DRY_RUN=true
+# (passe os secrets como placeholders — ex.: act -s DOCKERHUB_USERNAME=user -s DOCKERHUB_TOKEN=token ou via arquivo .secrets)
+#
+# Para o comportamento real (push no GitHub): DRY_RUN não é definido e o fluxo completo roda normal.
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish-docker-image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        if: ${{ env.DRY_RUN != 'true' }}
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build e Push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: src/Web/Dockerfile
+          push: ${{ env.DRY_RUN != 'true' }}
+          load: ${{ env.DRY_RUN == 'true' }}
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/archivum-web:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/archivum-web:${{ github.sha }}
+
+      - name: Dry-run — Imagem NÃO publicada
+        if: ${{ env.DRY_RUN == 'true' }}
+        run: 'echo "DRY_RUN ativado: build concluído, push para o Docker Hub pulado."'
+
+  deploy-render:
+    needs: publish-docker-image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to Render
+        if: ${{ env.DRY_RUN != 'true' }}
+        run: curl -sS -f -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+
+      - name: Dry-run — Deploy no Render NÃO disparado
+        if: ${{ env.DRY_RUN == 'true' }}
+        run: 'echo "DRY_RUN ativado: chamada ao deploy hook do Render pulada."'
