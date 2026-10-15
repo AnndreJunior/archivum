@@ -55,6 +55,7 @@ database/schema.ts    (gerado)
 database/schema_rules.ts
 docs/                 arquitetura.md, modelo-de-dados.md, regras-de-negocio.md
 resources/views/      templates Edge (layout em components/layouts/app.edge)
+tests/helpers/        database.ts (banco de teste por grupo via Testcontainers)
 ```
 
 ## 5. Comandos úteis

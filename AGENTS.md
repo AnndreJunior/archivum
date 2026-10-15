@@ -52,6 +52,8 @@ bibliotecário e o empréstimo é registrado ali.
 - Só o banco (para rodar a app no host com `npm run dev`): `docker compose up -d db`
 - Logs da app: `docker compose logs -f app`
 - Derrubar: `docker compose down` (use `-v` para apagar também o volume do banco)
+- Testes com banco usam **Testcontainers** e exigem o Docker em execução; eles sobem um
+  Postgres próprio por grupo de teste, independente do `docker compose`.
 - O serviço `app` só sobe após o `db` ficar healthy e roda `node ace migration:run --force`
   antes de iniciar o servidor.
 - O `Dockerfile` é multi-stage: a imagem final contém apenas deps de produção + `build/`.
@@ -81,6 +83,10 @@ bibliotecário e o empréstimo é registrado ali.
 
 - Testes usam **Japa**, não Jest/Vitest. `tests/bootstrap.ts` configura plugins e suítes.
 - Testes funcionais sobem um servidor HTTP real; a config de teste fica em `.env.test`.
+- Testes que precisam de banco chamam `useDatabase(group)` (de `#tests/helpers/database`)
+  dentro do `test.group`. O helper sobe um container Postgres exclusivo do grupo, roda as
+  migrations uma vez e trunca as tabelas a cada teste; o container é derrubado no fim do
+  grupo.
 - Views são **Edge**, não React/Vue/Inertia (mesmo que o AdonisJS v7 ofereça esses kits).
 - Páginas usam o layout `resources/views/components/layouts/app.edge` (`@layouts.app()`),
   que injeta o CSS via `@vite(['resources/css/app.css'])`. O Tailwind v4 é compilado pelo
