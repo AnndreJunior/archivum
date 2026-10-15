@@ -29,7 +29,7 @@ const authConfig = defineConfig({
        * Defines how to fetch and verify user credentials.
        */
       provider: sessionUserProvider({
-        model: () => import('#models/user'),
+        model: () => import('#models/bibliotecario'),
       }),
     }),
   },

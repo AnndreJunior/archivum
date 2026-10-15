@@ -7,19 +7,182 @@
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
-export class UserSchema extends BaseModel {
-  static $columns = ['createdAt', 'email', 'fullName', 'id', 'password', 'updatedAt'] as const
-  $columns = UserSchema.$columns
+export class AlunoSchema extends BaseModel {
+  static $columns = [
+    'anoEscolar',
+    'ativo',
+    'createdAt',
+    'email',
+    'id',
+    'matricula',
+    'nivel',
+    'nome',
+    'telefone',
+    'turma',
+    'updatedAt',
+  ] as const
+  $columns = AlunoSchema.$columns
+  @column()
+  declare anoEscolar: number
+  @column()
+  declare ativo: boolean
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare email: string | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare matricula: string
+  @column()
+  declare nivel: string
+  @column()
+  declare nome: string
+  @column()
+  declare telefone: string | null
+  @column()
+  declare turma: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class AutorSchema extends BaseModel {
+  static $columns = ['createdAt', 'id', 'nome', 'updatedAt'] as const
+  $columns = AutorSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare nome: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class AutorLivroSchema extends BaseModel {
+  static $columns = ['autorId', 'livroId'] as const
+  $columns = AutorLivroSchema.$columns
+  @column()
+  declare autorId: number
+  @column({ isPrimary: true })
+  declare livroId: number
+}
+
+export class BibliotecarioSchema extends BaseModel {
+  static $columns = [
+    'ativo',
+    'createdAt',
+    'email',
+    'id',
+    'matricula',
+    'nome',
+    'role',
+    'senha',
+    'updatedAt',
+  ] as const
+  $columns = BibliotecarioSchema.$columns
+  @column()
+  declare ativo: boolean
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column()
   declare email: string
-  @column()
-  declare fullName: string | null
   @column({ isPrimary: true })
   declare id: number
+  @column()
+  declare matricula: string
+  @column()
+  declare nome: string
+  @column()
+  declare role: string
   @column({ serializeAs: null })
-  declare password: string
+  declare senha: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class EmprestimoSchema extends BaseModel {
+  static $columns = [
+    'alunoId',
+    'bibliotecarioDevolucaoId',
+    'bibliotecarioRetiradaId',
+    'createdAt',
+    'dataDevolucao',
+    'dataPrevistaDevolucao',
+    'dataRetirada',
+    'exemplarId',
+    'id',
+    'renovacoes',
+    'status',
+    'updatedAt',
+  ] as const
+  $columns = EmprestimoSchema.$columns
+  @column()
+  declare alunoId: number
+  @column()
+  declare bibliotecarioDevolucaoId: number | null
+  @column()
+  declare bibliotecarioRetiradaId: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column.date()
+  declare dataDevolucao: DateTime | null
+  @column.date()
+  declare dataPrevistaDevolucao: DateTime
+  @column.date()
+  declare dataRetirada: DateTime
+  @column()
+  declare exemplarId: number
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare renovacoes: number
+  @column()
+  declare status: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class ExemplarSchema extends BaseModel {
+  static $columns = ['codigo', 'createdAt', 'id', 'livroId', 'situacao', 'updatedAt'] as const
+  $columns = ExemplarSchema.$columns
+  @column()
+  declare codigo: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare livroId: number
+  @column()
+  declare situacao: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class LivroSchema extends BaseModel {
+  static $columns = [
+    'anoPublicacao',
+    'createdAt',
+    'editora',
+    'id',
+    'isbn',
+    'titulo',
+    'updatedAt',
+  ] as const
+  $columns = LivroSchema.$columns
+  @column()
+  declare anoPublicacao: number | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare editora: string | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare isbn: string | null
+  @column()
+  declare titulo: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 }
