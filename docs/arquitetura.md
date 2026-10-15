@@ -66,3 +66,12 @@ tests/helpers/        database.ts (banco de teste por grupo via Testcontainers)
 - Testes: `node ace test` (suítes `unit`, `functional`, `browser`)
 - Lint / format / typecheck: `npm run lint`, `npm run format`, `npm run typecheck`
 - Subir banco + app: `docker compose up -d --build`; só o banco: `docker compose up -d db`
+
+## 6. Bootstrap do bibliotecário admin
+
+No startup do servidor HTTP, o preload `start/admin.ts` (registrado em `adonisrc.ts`
+apenas no ambiente `web`) garante que exista um bibliotecário com `role = 'admin'`. Se
+não houver nenhum, ele é criado por `app/services/admin_bibliotecario.ts` usando as
+variáveis de ambiente `ADMIN_NOME`, `ADMIN_MATRICULA`, `ADMIN_EMAIL` e `ADMIN_SENHA`
+(secreta, com hash aplicado pelo `withAuthFinder`). Como roda só no ambiente `web`, não
+interfere nos testes nem em comandos do Ace, e executa depois das migrations.

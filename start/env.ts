@@ -25,6 +25,12 @@ export default await Env.create(new URL('../', import.meta.url), {
   // Session
   SESSION_DRIVER: Env.schema.enum(['cookie', 'memory', 'database'] as const),
 
+  // Admin (bibliotecário admin criado no startup, caso não exista)
+  ADMIN_NOME: Env.schema.string(),
+  ADMIN_MATRICULA: Env.schema.string(),
+  ADMIN_EMAIL: Env.schema.string({ format: 'email' }),
+  ADMIN_SENHA: Env.schema.string(),
+
   // Database
   DB_HOST: Env.schema.string({ format: 'host' }),
   DB_PORT: Env.schema.number(),
