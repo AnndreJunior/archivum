@@ -64,16 +64,19 @@ bibliotecário e o empréstimo é registrado ali.
 ### TDD
 
 1. **Escreva/ajuste o teste primeiro** e execute-o.
-2. **Valide a falha**: o erro deve ser apenas pela ausência da implementação concreta dos
-   módulos (import inexistente, classe/método/coluna ainda não criados). Qualquer outra
-   falha (teste mal escrito, asserção errada, problema de ambiente) deve ser corrigida no
-   próprio teste antes de seguir.
-3. **Peça revisão dos testes** ao usuário.
-4. Se aprovado, **commite os testes** (`test: ...`).
-5. **Só então implemente o código de produção.**
-6. Rode a suíte; **nunca altere um teste para o código de produção passar** — se falha, o
+2. **Crie o esqueleto do código de produção**: os arquivos e as assinaturas (classe,
+   método, coluna) já devem existir, porém **sem implementação concreta** — cada método
+   lança um erro de "não implementado". Sem o arquivo, o teste falha por "módulo
+   inexistente", o que não valida a asserção.
+3. **Valide a falha**: o erro deve ser apenas o "não implementado" (ou outra pendência do
+   próprio esqueleto). Qualquer outra falha (teste mal escrito, asserção errada, problema
+   de ambiente) deve ser corrigida no próprio teste antes de seguir.
+4. **Peça revisão dos testes** ao usuário.
+5. Se aprovado, **commite os testes** (`test: ...`).
+6. **Só então implemente o código de produção.**
+7. Rode a suíte; **nunca altere um teste para o código de produção passar** — se falha, o
    código de produção está errado.
-7. **Peça revisão do código de produção** antes de commitar (`feat:`/`fix:`/`refactor:`).
+8. **Peça revisão do código de produção** antes de commitar (`feat:`/`fix:`/`refactor:`).
 
 - Commits seguem **Conventional Commits** (ex.: `feat:`, `fix:`, `test:`, `refactor:`).
 - Por enquanto, trabalhe **direto na `main`** (sem branches).
