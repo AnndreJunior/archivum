@@ -41,7 +41,7 @@ bibliotecário e o empréstimo é registrado ali.
 - Instalar + configurar pacote: `node ace add <pacote>`
 - Migrations: `node ace migration:run` / `node ace migration:rollback`
 - Todos os testes: `node ace test`
-- Uma suíte: `node ace test unit`   (suítes: `unit`, `functional`, `browser`)
+- Uma suíte: `node ace test unit` (suítes: `unit`, `functional`, `browser`)
 - Um arquivo: `node ace test --files="users/index"`
 - Um teste / grupo: `node ace test --tests="<título>"` / `--groups="<grupo>"`
 - Criar teste: `node ace make:test users/list --suite=functional`
@@ -59,13 +59,23 @@ bibliotecário e o empréstimo é registrado ali.
 
 ## Fluxo de trabalho (obrigatório)
 
-- **TDD**: escreva/ajuste o teste primeiro, depois a implementação.
-- **Nunca modifique um teste para o código de produção passar.** Se o teste falha, o
-  código de produção está errado.
-- **Sempre peça revisão** do código (de teste ou de produção) **antes de qualquer commit**.
-  Não commite sem revisão.
+### TDD
+
+1. **Escreva/ajuste o teste primeiro** e execute-o.
+2. **Valide a falha**: o erro deve ser apenas pela ausência da implementação concreta dos
+   módulos (import inexistente, classe/método/coluna ainda não criados). Qualquer outra
+   falha (teste mal escrito, asserção errada, problema de ambiente) deve ser corrigida no
+   próprio teste antes de seguir.
+3. **Peça revisão dos testes** ao usuário.
+4. Se aprovado, **commite os testes** (`test: ...`).
+5. **Só então implemente o código de produção.**
+6. Rode a suíte; **nunca altere um teste para o código de produção passar** — se falha, o
+   código de produção está errado.
+7. **Peça revisão do código de produção** antes de commitar (`feat:`/`fix:`/`refactor:`).
+
 - Commits seguem **Conventional Commits** (ex.: `feat:`, `fix:`, `test:`, `refactor:`).
 - Por enquanto, trabalhe **direto na `main`** (sem branches).
+- **Nunca commite sem revisão** (de teste ou de produção).
 
 ## Notas não óbvias
 
