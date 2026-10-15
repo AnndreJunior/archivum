@@ -11,8 +11,8 @@ bibliotecário e o empréstimo é registrado ali.
 
 - **AdonisJS v7** — monolito MVC (TypeScript, ESM). Requer **Node.js >= 24** e npm >= 11.
 - Views: templates **Edge** + **Tailwind CSS v4** (via Vite).
-- Banco: **PostgreSQL 16** via Lucid ORM. O scaffold do AdonisJS usa SQLite por padrão;
-  o Postgres precisa ser configurado explicitamente.
+- Banco: **PostgreSQL 16** via Lucid ORM (conexão `pg` em `config/database.ts`); credenciais
+  vêm das variáveis `DB_*`.
 - Projeto totalmente containerizado; serviços essenciais (banco, etc.) via **docker compose**.
 
 ## Regras de negócio
@@ -46,6 +46,17 @@ bibliotecário e o empréstimo é registrado ali.
 - Um teste / grupo: `node ace test --tests="<título>"` / `--groups="<grupo>"`
 - Criar teste: `node ace make:test users/list --suite=functional`
 
+## Docker
+
+- Subir tudo (banco + app): `docker compose up -d --build`
+- Só o banco (para rodar a app no host com `npm run dev`): `docker compose up -d db`
+- Logs da app: `docker compose logs -f app`
+- Derrubar: `docker compose down` (use `-v` para apagar também o volume do banco)
+- O serviço `app` só sobe após o `db` ficar healthy e roda `node ace migration:run --force`
+  antes de iniciar o servidor.
+- O `Dockerfile` é multi-stage: a imagem final contém apenas deps de produção + `build/`.
+- Portas/credenciais parametrizadas por `DB_*` e `APP_PORT` (defaults no `docker-compose.yml`).
+
 ## Fluxo de trabalho (obrigatório)
 
 - **TDD**: escreva/ajuste o teste primeiro, depois a implementação.
@@ -61,3 +72,6 @@ bibliotecário e o empréstimo é registrado ali.
 - Testes usam **Japa**, não Jest/Vitest. `tests/bootstrap.ts` configura plugins e suítes.
 - Testes funcionais sobem um servidor HTTP real; a config de teste fica em `.env.test`.
 - Views são **Edge**, não React/Vue/Inertia (mesmo que o AdonisJS v7 ofereça esses kits).
+- Páginas usam o layout `resources/views/components/layouts/app.edge` (`@layouts.app()`),
+  que injeta o CSS via `@vite(['resources/css/app.css'])`. O Tailwind v4 é compilado pelo
+  plugin `@tailwindcss/vite` (configurado em `vite.config.ts`).

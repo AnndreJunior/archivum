@@ -17,5 +17,29 @@ services:
       timeout: 5s
       retries: 5
 
+  app:
+    build: .
+    container_name: archivum-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3333
+      APP_KEY: ${APP_KEY}
+      APP_URL: ${APP_URL:-http://localhost:3333}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      SESSION_DRIVER: ${SESSION_DRIVER:-cookie}
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-archivum}
+      DB_PASSWORD: ${DB_PASSWORD:-archivum}
+      DB_DATABASE: ${DB_DATABASE:-archivum}
+    ports:
+      - '${APP_PORT:-3333}:3333'
+    command: sh -c "node ace migration:run --force && node bin/server.js"
+
 volumes:
   db-data:
