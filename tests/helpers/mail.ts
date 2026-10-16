@@ -1,6 +1,8 @@
 import type { Group } from '@japa/runner/core'
 import { GenericContainer, Wait } from 'testcontainers'
 import type { StartedTestContainer } from 'testcontainers'
+import mail from '@adonisjs/mail/services/main'
+import { SMTPTransport } from '@adonisjs/mail/transports/smtp'
 
 /**
  * Imagem do smtp4dev usada nos testes. Deve acompanhar a versão rodada em
@@ -118,6 +120,41 @@ export async function getMessages(): Promise<MensagemResumo[]> {
 }
 
 /**
+ * Devolve o HTML do corpo de uma mensagem. Útil para inspecionar links (por
+ * exemplo, o token de redefinição de senha) enviados pelo app.
+ */
+export async function getMessageHtml(messageId: string): Promise<string> {
+  const { dados } = await garantirServidor()
+  const response = await fetch(`${dados.webUrl}/api/Messages/${messageId}/html`)
+
+  if (!response.ok) {
+    throw new Error(`Falha ao ler o HTML da mensagem do smtp4dev: HTTP ${response.status}`)
+  }
+
+  return response.text()
+}
+
+/**
+ * Aguarda até que o servidor tenha pelo menos `quantidade` mensagens e devolve
+ * a lista atual. O smtp4dev só indexa a mensagem na API web alguns instantes
+ * depois de aceitar a conexão SMTP, então testes que esperam um e-mail devem
+ * usar este helper em vez de `getMessages` diretamente.
+ *
+ * Para asserções negativas, passe um `timeoutMs` curto e verifique o retorno.
+ */
+export async function waitForMessages(quantidade = 1, timeoutMs = 5000): Promise<MensagemResumo[]> {
+  const inicio = Date.now()
+  let mensagens = await getMessages()
+
+  while (mensagens.length < quantidade && Date.now() - inicio < timeoutMs) {
+    await new Promise((resolve) => setTimeout(resolve, 100))
+    mensagens = await getMessages()
+  }
+
+  return mensagens
+}
+
+/**
  * Remove todas as mensagens da caixa de entrada. A API do smtp4dev expõe o
  * "apagar tudo" na rota `DELETE /api/Messages/*`.
  */
@@ -145,6 +182,19 @@ export async function stopMailServer(): Promise<void> {
 }
 
 /**
+ * Aponta o mailer padrão da aplicação para o container do smtp4dev, de modo
+ * que os e-mails enviados com `mail.send` cheguem à caixa inspecionada por
+ * `getMessages`/`getMessageHtml`. A troca substitui a fábrica do transport e
+ * limpa o cache de mailers para que a próxima mensagem use o novo endereço.
+ */
+async function apontarMailerParaServidor(): Promise<void> {
+  const { host, smtpPort } = await getMailServer()
+
+  mail.config.mailers.smtp = () => new SMTPTransport({ host, port: smtpPort })
+  await mail.close('smtp')
+}
+
+/**
  * Prepara o servidor smtp4dev para o grupo de testes.
  *
  * O container sobe uma única vez para toda a suíte (compartilhado entre todos
@@ -168,11 +218,13 @@ export async function stopMailServer(): Promise<void> {
  */
 export function useMail(group: Group) {
   /**
-   * Sobe o servidor antes do primeiro teste do grupo. A instância é
-   * compartilhada por toda a suíte, então nunca é derrubada aqui.
+   * Sobe o servidor antes do primeiro teste do grupo e aponta o mailer do app
+   * para ele. A instância é compartilhada por toda a suíte, então nunca é
+   * derrubada aqui.
    */
   group.setup(async () => {
     await garantirServidor()
+    await apontarMailerParaServidor()
   })
 
   /**

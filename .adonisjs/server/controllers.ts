@@ -5,4 +5,5 @@
 
 export const controllers = {
   Auth: () => import('#controllers/auth_controller'),
+  RecuperacaoSenha: () => import('#controllers/recuperacao_senha_controller'),
 }

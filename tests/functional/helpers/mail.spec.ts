@@ -1,6 +1,13 @@
 import net from 'node:net'
 import { test } from '@japa/runner'
-import { getMailServer, getMessages, useMail } from '#tests/helpers/mail'
+import mail from '@adonisjs/mail/services/main'
+import {
+  getMailServer,
+  getMessageHtml,
+  getMessages,
+  useMail,
+  waitForMessages,
+} from '#tests/helpers/mail'
 
 /**
  * Importa uma mensagem .eml diretamente na caixa do smtp4dev (`PUT
@@ -73,6 +80,21 @@ test.group('Helpers | servidor de e-mail (smtp4dev)', (group) => {
     const banner = await lerBannerSmtp(host, smtpPort)
 
     assert.match(banner, /^220/)
+  })
+
+  test('entrega no servidor os e-mails enviados pelo app', async ({ assert }) => {
+    await mail.send((message) => {
+      message.to('bib@archivum.test').subject('Boas-vindas').html('<p>Olá!</p>')
+    })
+
+    const mensagens = await waitForMessages()
+
+    assert.lengthOf(mensagens, 1)
+    assert.equal(mensagens[0].subject, 'Boas-vindas')
+    assert.deepEqual(mensagens[0].to, ['bib@archivum.test'])
+
+    const html = await getMessageHtml(mensagens[0].id)
+    assert.include(html, 'Olá!')
   })
 
   test('limpa as mensagens antes de cada teste', async ({ assert }) => {

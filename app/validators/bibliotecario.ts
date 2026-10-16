@@ -24,3 +24,19 @@ export const loginValidator = vine.create({
   email: email(),
   senha: vine.string(),
 })
+
+/**
+ * Validador do pedido de recuperação de senha (apenas o e-mail).
+ */
+export const esqueciSenhaValidator = vine.create({
+  email: email(),
+})
+
+/**
+ * Validador da troca de senha a partir do token recebido por e-mail.
+ */
+export const trocarSenhaValidator = vine.create({
+  token: vine.string(),
+  senha: senha(),
+  senhaConfirmation: senha().sameAs('senha'),
+})

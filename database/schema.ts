@@ -186,3 +186,18 @@ export class LivroSchema extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 }
+
+export class RecuperacaoSenhaSchema extends BaseModel {
+  static $columns = ['bibliotecarioId', 'createdAt', 'expiresAt', 'id', 'tokenHash'] as const
+  $columns = RecuperacaoSenhaSchema.$columns
+  @column()
+  declare bibliotecarioId: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column.dateTime()
+  declare expiresAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare tokenHash: string
+}
