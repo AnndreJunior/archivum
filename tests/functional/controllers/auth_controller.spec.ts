@@ -49,7 +49,7 @@ test.group('AuthController | login e logout', (group) => {
 
     response.assertStatus(302)
     response.assertHeader('location', '/auth/login')
-    response.assertFlashMessage('error', 'Credenciais inválidas')
+    response.assertFlashMessage('loginError', 'Credenciais inválidas')
   })
 
   test('volta ao login com erro quando a conta está inativa', async ({ client }) => {
@@ -63,7 +63,7 @@ test.group('AuthController | login e logout', (group) => {
 
     response.assertStatus(302)
     response.assertHeader('location', '/auth/login')
-    response.assertFlashMessage('error', 'Credenciais inválidas')
+    response.assertFlashMessage('loginError', 'Credenciais inválidas')
   })
 
   test('rejeita e-mail em formato inválido sem autenticar', async ({ assert, client }) => {
@@ -117,10 +117,22 @@ test.group('AuthController | página de login', (group) => {
   test('exibe a mensagem de erro quando as credenciais falham', async ({ client }) => {
     const response = await client
       .get('/auth/login')
-      .withFlashMessages({ error: 'Credenciais inválidas' })
+      .withFlashMessages({ loginError: 'Credenciais inválidas' })
 
     response.assertStatus(200)
     response.assertTextIncludes('Credenciais inválidas')
+  })
+
+  test('ignora o aviso genérico de acesso não autorizado do redirect', async ({
+    assert,
+    client,
+  }) => {
+    const response = await client
+      .get('/auth/login')
+      .withFlashMessages({ error: 'Unauthorized access' })
+
+    response.assertStatus(200)
+    assert.notInclude(response.text(), 'Unauthorized access')
   })
 
   test('redireciona o bibliotecário autenticado para a home', async ({ client }) => {
