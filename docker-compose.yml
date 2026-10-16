@@ -32,6 +32,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      smtp4dev:
+        condition: service_started
     environment:
       NODE_ENV: production
       HOST: 0.0.0.0
@@ -44,6 +46,11 @@ services:
       ADMIN_MATRICULA: ${ADMIN_MATRICULA}
       ADMIN_EMAIL: ${ADMIN_EMAIL}
       ADMIN_SENHA: ${ADMIN_SENHA}
+      MAIL_MAILER: smtp
+      MAIL_FROM_NAME: ${MAIL_FROM_NAME:-Archivum}
+      MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:-noreply@archivum.local}
+      SMTP_HOST: smtp4dev
+      SMTP_PORT: 25
       DB_HOST: db
       DB_PORT: 5432
       DB_USER: ${DB_USER:-archivum}
