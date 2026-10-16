@@ -93,6 +93,46 @@ test.group('AuthController | login e logout', (group) => {
   })
 })
 
+test.group('AuthController | página de login', (group) => {
+  useDatabase(group)
+
+  test('renderiza o formulário de login em um card para o visitante', async ({ client }) => {
+    const response = await client.get('/auth/login')
+
+    response.assertStatus(200)
+    response.assertTextIncludes('action="/auth/login"')
+    response.assertTextIncludes('name="email"')
+    response.assertTextIncludes('name="senha"')
+    response.assertTextIncludes('Esqueci minha senha')
+  })
+
+  test('não exibe a navegação nem o botão de sair', async ({ assert, client }) => {
+    const response = await client.get('/auth/login')
+
+    response.assertStatus(200)
+    assert.notInclude(response.text(), 'Sair')
+    assert.notInclude(response.text(), 'Empréstimos')
+  })
+
+  test('exibe a mensagem de erro quando as credenciais falham', async ({ client }) => {
+    const response = await client
+      .get('/auth/login')
+      .withFlashMessages({ error: 'Credenciais inválidas' })
+
+    response.assertStatus(200)
+    response.assertTextIncludes('Credenciais inválidas')
+  })
+
+  test('redireciona o bibliotecário autenticado para a home', async ({ client }) => {
+    const bibliotecario = await criarBibliotecario()
+
+    const response = await client.get('/auth/login').loginAs(bibliotecario).redirects(0)
+
+    response.assertStatus(302)
+    response.assertHeader('location', '/')
+  })
+})
+
 test.group('Auth | proteção de rotas', (group) => {
   useDatabase(group)
 
