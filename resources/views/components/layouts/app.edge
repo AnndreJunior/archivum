@@ -34,13 +34,19 @@
           @end
         </nav>
 
-        <a
-          href="#"
-          class="inline-flex items-center gap-2 rounded-md border border-white/30 px-3 py-1.5 text-sm font-medium text-gray-200 transition-colors hover:border-white hover:text-white"
-        >
-          @svg('lucide:log-out', { class: 'h-4 w-4' })
-          Sair
-        </a>
+        {{-- O csrfField só existe quando o Shield roda (rotas registradas); em páginas de erro (404) ele não é compartilhado. --}}
+        @if(csrfField)
+          <form action="{{ route('auth.logout') }}" method="post">
+            {{ csrfField() }}
+            <button
+              type="submit"
+              class="inline-flex items-center gap-2 rounded-md border border-white/30 px-3 py-1.5 text-sm font-medium text-gray-200 transition-colors hover:border-white hover:text-white"
+            >
+              @svg('lucide:log-out', { class: 'h-4 w-4' })
+              Sair
+            </button>
+          </form>
+        @end
       </div>
     </header>
 
