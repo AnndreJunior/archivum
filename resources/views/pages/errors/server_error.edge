@@ -1,12 +1,24 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Erro {{ error.code || 500 }}</title>
-  </head>
-  <body>
-    <h1>{{ error.code || 500 }}</h1>
-    <p>Ocorreu um erro inesperado no servidor. Tente novamente em instantes.</p>
-  </body>
-</html>
+@layouts.app({ title: 'Erro ' + (error.code || 500) })
+  <div class="mx-auto flex max-w-lg flex-col items-center py-16 text-center">
+    <span class="flex h-16 w-16 items-center justify-center rounded-full bg-brand/10 text-brand">
+      @svg('lucide:server-crash', { class: 'h-8 w-8' })
+    </span>
+
+    <p class="mt-6 text-sm font-semibold tracking-wide text-brand uppercase">
+      Erro {{ error.code || 500 }}
+    </p>
+    <h1 class="mt-2 text-3xl font-bold text-gray-900">Algo deu errado</h1>
+    <p class="mt-3 text-gray-600">
+      Encontramos um problema inesperado por aqui. Tente novamente em alguns instantes — se o
+      erro continuar, avise quem cuida do sistema.
+    </p>
+
+    <a
+      href="{{ route('home') }}"
+      class="mt-8 inline-flex items-center gap-2 rounded-md bg-brand px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand/90"
+    >
+      @svg('lucide:house', { class: 'h-4 w-4' })
+      Voltar para a página inicial
+    </a>
+  </div>
+@end

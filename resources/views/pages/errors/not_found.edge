@@ -1,12 +1,22 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>404 — Página não encontrada</title>
-  </head>
-  <body>
-    <h1>404</h1>
-    <p>A página que você tentou acessar não existe.</p>
-  </body>
-</html>
+@layouts.app({ title: '404 — Página não encontrada' })
+  <div class="mx-auto flex max-w-lg flex-col items-center py-16 text-center">
+    <span class="flex h-16 w-16 items-center justify-center rounded-full bg-brand/10 text-brand">
+      @svg('lucide:search-x', { class: 'h-8 w-8' })
+    </span>
+
+    <p class="mt-6 text-sm font-semibold tracking-wide text-brand uppercase">Erro 404</p>
+    <h1 class="mt-2 text-3xl font-bold text-gray-900">Página não encontrada</h1>
+    <p class="mt-3 text-gray-600">
+      Não encontramos a página que você procura. Ela pode ter sido movida ou o endereço pode
+      estar incorreto.
+    </p>
+
+    <a
+      href="{{ route('home') }}"
+      class="mt-8 inline-flex items-center gap-2 rounded-md bg-brand px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand/90"
+    >
+      @svg('lucide:house', { class: 'h-4 w-4' })
+      Voltar para a página inicial
+    </a>
+  </div>
+@end
