@@ -82,6 +82,12 @@ bibliotecário e o empréstimo é registrado ali.
 - Por enquanto, trabalhe **direto na `main`** (sem branches).
 - **Nunca commite sem revisão** (de teste ou de produção).
 
+### Views (Edge)
+
+Views em `resources/views/**` são exceção ao TDD: **crie-as diretamente, sem testes** — a
+validação é visual, feita pelo usuário. Todo o restante (controllers, services, models,
+validators, middlewares, etc.) continua obrigado ao fluxo de TDD acima.
+
 ## Notas não óbvias
 
 - Testes usam **Japa**, não Jest/Vitest. `tests/bootstrap.ts` configura plugins e suítes.
