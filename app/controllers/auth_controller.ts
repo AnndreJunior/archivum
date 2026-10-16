@@ -12,6 +12,13 @@ export default class AuthController {
   constructor(private authService: AuthService) {}
 
   /**
+   * Exibe a página de login.
+   */
+  async show({ view }: HttpContext) {
+    return view.render('pages/auth/login')
+  }
+
+  /**
    * Autentica o bibliotecário e inicia a sessão.
    *
    * Em caso de credenciais inválidas ou conta inativa, volta para a tela de
@@ -25,7 +32,7 @@ export default class AuthController {
       await auth.use('web').login(bibliotecario)
     } catch (error) {
       if (error instanceof CredenciaisInvalidasException) {
-        session.flash('error', error.message)
+        session.flash('loginError', error.message)
         return response.redirect('/auth/login')
       }
       throw error

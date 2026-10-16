@@ -17,7 +17,8 @@ const AuthController = () => import('#controllers/auth_controller')
  */
 router
   .group(() => {
-    router.post('/login', [AuthController, 'login']).as('auth.login')
+    router.get('/login', [AuthController, 'show']).as('auth.login')
+    router.post('/login', [AuthController, 'login']).as('auth.login.attempt')
   })
   .prefix('/auth')
   .use(middleware.guest())
