@@ -6,7 +6,46 @@
     <title>{{ $props.get('title') || 'Archivum' }}</title>
     @vite(['resources/css/app.css'])
   </head>
-  <body>
-    {{{ await $slots.main() }}}
+  <body class="min-h-screen bg-white text-gray-900">
+    @let(active = $props.get('active') || 'home')
+    @let(navItems = [
+      { key: 'home', label: 'Home', href: route('home') },
+      { key: 'alunos', label: 'Alunos', href: '#' },
+      { key: 'livros', label: 'Livros', href: '#' },
+      { key: 'emprestimos', label: 'Empréstimos', href: '#' },
+    ])
+
+    <header class="bg-brand text-white">
+      <div class="mx-auto flex max-w-6xl items-center justify-between gap-6 px-6 py-4">
+        <a href="{{ route('home') }}" class="text-xl font-bold tracking-tight">Archivum</a>
+
+        <nav class="flex items-center gap-6">
+          @each(item in navItems)
+            <a
+              href="{{ item.href }}"
+              {{{ active === item.key ? 'aria-current="page"' : '' }}}
+              class="group relative py-1 text-sm font-medium text-gray-200 transition-colors hover:text-white"
+            >
+              {{ item.label }}
+              <span
+                class="absolute inset-x-0 -bottom-0.5 h-0.5 origin-left scale-x-0 rounded-full bg-gray-200 transition-transform duration-300 ease-out group-hover:scale-x-100 {{ active === item.key ? 'scale-x-100' : '' }}"
+              ></span>
+            </a>
+          @end
+        </nav>
+
+        <a
+          href="#"
+          class="inline-flex items-center gap-2 rounded-md border border-white/30 px-3 py-1.5 text-sm font-medium text-gray-200 transition-colors hover:border-white hover:text-white"
+        >
+          @svg('lucide:log-out', { class: 'h-4 w-4' })
+          Sair
+        </a>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-6xl px-6 py-10">
+      {{{ await $slots.main() }}}
+    </main>
   </body>
 </html>
