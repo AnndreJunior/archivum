@@ -96,6 +96,10 @@ validators, middlewares, etc.) continua obrigado ao fluxo de TDD acima.
   dentro do `test.group`. O helper sobe um container Postgres exclusivo do grupo, roda as
   migrations uma vez e trunca as tabelas a cada teste; o container é derrubado no fim do
   grupo.
+- Testes que precisam verificar e-mails chamam `useMail(group)` (de `#tests/helpers/mail`).
+  Diferente do banco, existe **um único** container smtp4dev compartilhado por toda a suíte
+  (derrubado no teardown global); a caixa é limpa a cada teste e as mensagens são
+  inspecionadas pela API web do smtp4dev (`getMessages`).
 - Views são **Edge**, não React/Vue/Inertia (mesmo que o AdonisJS v7 ofereça esses kits).
 - Páginas usam o layout `resources/views/components/layouts/app.edge` (`@layouts.app()`),
   que injeta o CSS via `@vite(['resources/css/app.css'])`. O Tailwind v4 é compilado pelo

@@ -55,7 +55,7 @@ database/schema.ts    (gerado)
 database/schema_rules.ts
 docs/                 arquitetura.md, modelo-de-dados.md, regras-de-negocio.md
 resources/views/      templates Edge (layout em components/layouts/app.edge)
-tests/helpers/        database.ts (banco de teste por grupo via Testcontainers)
+tests/helpers/        database.ts (banco por grupo), mail.ts (smtp4dev por suíte) — Testcontainers
 ```
 
 ## 5. Comandos úteis

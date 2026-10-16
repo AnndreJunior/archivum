@@ -6,6 +6,7 @@ import { browserClient } from '@japa/browser-client'
 import { pluginAdonisJS } from '@japa/plugin-adonisjs'
 import { dbAssertions } from '@adonisjs/lucid/plugins/db'
 import testUtils from '@adonisjs/core/services/test_utils'
+import { stopMailServer } from '#tests/helpers/mail'
 import { authBrowserClient } from '@adonisjs/auth/plugins/browser_client'
 import { authApiClient } from '@adonisjs/auth/plugins/api_client'
 import { sessionBrowserClient } from '@adonisjs/session/plugins/browser_client'
@@ -42,7 +43,7 @@ export const plugins: Config['plugins'] = [
  */
 export const runnerHooks: Required<Pick<Config, 'setup' | 'teardown'>> = {
   setup: [],
-  teardown: [],
+  teardown: [() => stopMailServer()],
 }
 
 /**
