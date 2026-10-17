@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{{ $props.get('title') || 'Archivum' }}</title>
-    @vite(['resources/css/app.css'])
+    @vite(['resources/css/app.css', 'resources/js/mascara-telefone.js'])
   </head>
   <body class="min-h-screen bg-white text-gray-900">
     @let(active = $props.get('active'))
