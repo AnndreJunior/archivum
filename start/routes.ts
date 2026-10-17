@@ -12,6 +12,7 @@ import router from '@adonisjs/core/services/router'
 
 const AuthController = () => import('#controllers/auth_controller')
 const RecuperacaoSenhaController = () => import('#controllers/recuperacao_senha_controller')
+const AlunoController = () => import('#controllers/aluno_controller')
 
 /**
  * Autenticação — rotas públicas (acessíveis sem sessão).
@@ -53,5 +54,29 @@ router
 router
   .group(() => {
     router.on('/').render('pages/home').as('home')
+  })
+  .use(middleware.auth())
+
+/**
+ * Alunos (exigem autenticação). Apenas administradores alternam o status.
+ */
+router
+  .group(() => {
+    router.get('/alunos', [AlunoController, 'index']).as('alunos.index')
+    router.get('/alunos/criar', [AlunoController, 'create']).as('alunos.create')
+    router.post('/alunos', [AlunoController, 'store']).as('alunos.store')
+    router
+      .get('/alunos/:id/editar', [AlunoController, 'edit'])
+      .where('id', /^[0-9]+$/)
+      .as('alunos.edit')
+    router
+      .put('/alunos/:id', [AlunoController, 'update'])
+      .where('id', /^[0-9]+$/)
+      .as('alunos.update')
+    router
+      .patch('/alunos/:id/ativo', [AlunoController, 'alternarAtivo'])
+      .where('id', /^[0-9]+$/)
+      .use(middleware.admin())
+      .as('alunos.ativo')
   })
   .use(middleware.auth())

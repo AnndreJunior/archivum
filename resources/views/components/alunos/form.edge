@@ -1,0 +1,172 @@
+{{--
+  Partial do formulário de aluno.
+
+  Props:
+    acao   - URL de submissão (formAttributes(...).action). Quando o método não
+             é GET/POST, o _method já vem na query string do action.
+    metodo - Método HTML do formulário (formAttributes(...).method).
+    aluno  - Aluno sendo editado (opcional).
+--}}
+@let(aluno = $props.get('aluno'))
+@let(acao = $props.get('acao'))
+@let(metodo = $props.get('metodo'))
+
+<form action="{{ acao }}" method="{{ metodo ?? 'post' }}" class="space-y-5">
+  {{ csrfField() }}
+
+  <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+    <div class="sm:col-span-2">
+      <label for="nome" class="block text-sm font-medium text-gray-900">Nome</label>
+      <input
+        type="text"
+        id="nome"
+        name="nome"
+        value="{{ old('nome', aluno ? aluno.nome : '') }}"
+        required
+        autofocus
+        class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/30"
+      />
+      @inputError('nome')
+        @each(message in $messages)
+          <p class="mt-1 text-sm text-red-600">{{ message }}</p>
+        @end
+      @end
+    </div>
+
+    <div>
+      <label for="matricula" class="block text-sm font-medium text-gray-900">Matrícula</label>
+      <input
+        type="text"
+        id="matricula"
+        name="matricula"
+        value="{{ old('matricula', aluno ? aluno.matricula : '') }}"
+        maxlength="20"
+        required
+        class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/30"
+      />
+      @inputError('matricula')
+        @each(message in $messages)
+          <p class="mt-1 text-sm text-red-600">{{ message }}</p>
+        @end
+      @end
+    </div>
+
+    <div>
+      <label for="anoEscolar" class="block text-sm font-medium text-gray-900">Ano escolar</label>
+      <input
+        type="number"
+        id="anoEscolar"
+        name="anoEscolar"
+        value="{{ old('anoEscolar', aluno ? aluno.anoEscolar : '') }}"
+        min="1"
+        max="9"
+        required
+        class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/30"
+      />
+      @inputError('anoEscolar')
+        @each(message in $messages)
+          <p class="mt-1 text-sm text-red-600">{{ message }}</p>
+        @end
+      @end
+    </div>
+
+    <div>
+      <label for="turma" class="block text-sm font-medium text-gray-900">Turma</label>
+      <input
+        type="text"
+        id="turma"
+        name="turma"
+        value="{{ old('turma', aluno ? aluno.turma : '') }}"
+        maxlength="1"
+        required
+        class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm uppercase text-gray-900 shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/30"
+      />
+      @inputError('turma')
+        @each(message in $messages)
+          <p class="mt-1 text-sm text-red-600">{{ message }}</p>
+        @end
+      @end
+    </div>
+
+    <div>
+      <label for="nivel" class="block text-sm font-medium text-gray-900">Nível</label>
+      <select
+        id="nivel"
+        name="nivel"
+        required
+        class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/30"
+      >
+        <option value="">Selecione</option>
+        <option
+          value="fundamental"
+          {{ old('nivel', aluno ? aluno.nivel : '') === 'fundamental' ? 'selected' : '' }}
+        >
+          Ensino fundamental
+        </option>
+        <option
+          value="medio"
+          {{ old('nivel', aluno ? aluno.nivel : '') === 'medio' ? 'selected' : '' }}
+        >
+          Ensino médio
+        </option>
+      </select>
+      @inputError('nivel')
+        @each(message in $messages)
+          <p class="mt-1 text-sm text-red-600">{{ message }}</p>
+        @end
+      @end
+    </div>
+
+    <div>
+      <label for="email" class="block text-sm font-medium text-gray-900">
+        E-mail <span class="text-gray-400">(opcional)</span>
+      </label>
+      <input
+        type="email"
+        id="email"
+        name="email"
+        value="{{ old('email', aluno ? (aluno.email ?? '') : '') }}"
+        class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/30"
+      />
+      @inputError('email')
+        @each(message in $messages)
+          <p class="mt-1 text-sm text-red-600">{{ message }}</p>
+        @end
+      @end
+    </div>
+
+    <div>
+      <label for="telefone" class="block text-sm font-medium text-gray-900">
+        Telefone <span class="text-gray-400">(opcional)</span>
+      </label>
+      <input
+        type="tel"
+        id="telefone"
+        name="telefone"
+        value="{{ old('telefone', aluno ? aluno.telefoneFormatado : '') }}"
+        class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/30"
+      />
+      @inputError('telefone')
+        @each(message in $messages)
+          <p class="mt-1 text-sm text-red-600">{{ message }}</p>
+        @end
+      @end
+    </div>
+  </div>
+
+  <div class="flex items-center gap-3 pt-2">
+    <button
+      type="submit"
+      class="inline-flex items-center gap-2 rounded-md bg-brand px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand/90"
+    >
+      @svg('lucide:check', { class: 'h-4 w-4' })
+      Salvar
+    </button>
+    <a
+      href="{{ route('alunos.index') }}"
+      class="text-sm font-medium text-gray-600 hover:text-gray-900"
+    >
+      Cancelar
+    </a>
+  </div>
+</form>

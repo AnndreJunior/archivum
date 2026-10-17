@@ -1,0 +1,149 @@
+@layouts.app({ title: 'Alunos — Archivum', active: 'alunos' })
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Alunos</h1>
+      <p class="mt-1 text-sm text-gray-600">Gerencie os alunos cadastrados na biblioteca.</p>
+    </div>
+
+    <a
+      href="{{ route('alunos.create') }}"
+      class="inline-flex items-center gap-2 rounded-md bg-brand px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand/90"
+    >
+      @svg('lucide:user-plus', { class: 'h-4 w-4' })
+      Novo aluno
+    </a>
+  </div>
+
+  @flashMessage('sucesso')
+    <div
+      class="mt-6 flex items-start gap-3 rounded-md border border-green-200 bg-green-50 p-3 text-sm text-green-700"
+    >
+      @svg('lucide:circle-check', { class: 'mt-0.5 h-4 w-4 shrink-0' })
+      <span>{{ $message }}</span>
+    </div>
+  @end
+
+  <form action="{{ route('alunos.index') }}" method="get" class="mt-6 flex items-center gap-2">
+    <input
+      type="search"
+      name="busca"
+      value="{{ busca }}"
+      placeholder="Buscar por nome ou matrícula"
+      class="block w-full max-w-sm rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/30"
+    />
+    <button
+      type="submit"
+      class="inline-flex items-center gap-2 rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+    >
+      @svg('lucide:search', { class: 'h-4 w-4' })
+      Buscar
+    </button>
+  </form>
+
+  <div class="mt-6 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+    <table class="min-w-full divide-y divide-gray-200 text-sm">
+      <thead class="bg-gray-50 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+        <tr>
+          <th class="px-4 py-3">Aluno</th>
+          <th class="px-4 py-3">Nível</th>
+          <th class="px-4 py-3">Contato</th>
+          <th class="px-4 py-3">Status</th>
+          <th class="px-4 py-3 text-right">Ações</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        @each(aluno in alunos)
+          <tr>
+            <td class="px-4 py-3">
+              <div class="font-medium text-gray-900">{{ aluno.nome }}</div>
+              <div class="text-xs text-gray-500">{{ aluno.matricula }}</div>
+            </td>
+            <td class="px-4 py-3 text-gray-700">
+              {{ aluno.nivel === 'medio' ? 'Ensino médio' : 'Ensino fundamental' }} ·
+              {{ aluno.anoEscolar }}º · Turma {{ aluno.turma }}
+            </td>
+            <td class="px-4 py-3 text-gray-700">
+              <div>{{ aluno.email || '—' }}</div>
+              <div class="text-xs text-gray-500">{{ aluno.telefoneFormatado || '—' }}</div>
+            </td>
+            <td class="px-4 py-3">
+              @if(aluno.ativo)
+                <span
+                  class="inline-flex rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700"
+                >
+                  Ativo
+                </span>
+              @else
+                <span
+                  class="inline-flex rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600"
+                >
+                  Inativo
+                </span>
+              @end
+            </td>
+            <td class="px-4 py-3">
+              <div class="flex items-center justify-end gap-3">
+                <a
+                  href="{{ route('alunos.edit', { id: aluno.id }) }}"
+                  class="inline-flex items-center gap-1 font-medium text-brand hover:underline"
+                >
+                  @svg('lucide:pen-line', { class: 'h-4 w-4' })
+                  Editar
+                </a>
+
+                @if(podeAlternarAtivo)
+                  {{--
+                    `formAttributes` move o `_method=PATCH` para a query string:
+                    o roteador resolve a rota antes de ler o corpo, então um
+                    `_method` escondido no corpo não seria aplicado.
+                  --}}
+                  @let(alternarAtivoForm = formAttributes('alunos.ativo', { id: aluno.id }))
+                  <form action="{{ alternarAtivoForm.action }}" method="{{ alternarAtivoForm.method }}">
+                    {{ csrfField() }}
+                    <button
+                      type="submit"
+                      class="inline-flex cursor-pointer items-center gap-1 font-medium text-gray-600 hover:text-gray-900"
+                    >
+                      @svg(aluno.ativo ? 'lucide:user-x' : 'lucide:user-check', { class: 'h-4 w-4' })
+                      {{ aluno.ativo ? 'Desativar' : 'Reativar' }}
+                    </button>
+                  </form>
+                @end
+              </div>
+            </td>
+          </tr>
+        @else
+          <tr>
+            <td colspan="5" class="px-4 py-10 text-center text-gray-500">
+              Nenhum aluno encontrado.
+            </td>
+          </tr>
+        @end
+      </tbody>
+    </table>
+  </div>
+
+  @if(alunos.hasPages)
+    <div class="mt-4 flex items-center justify-between text-sm text-gray-600">
+      <span>Página {{ alunos.currentPage }} de {{ alunos.lastPage }}</span>
+      <div class="flex items-center gap-2">
+        @if(alunos.currentPage > 1)
+          <a
+            href="{{ alunos.getUrl(alunos.currentPage - 1) }}"
+            class="rounded-md border border-gray-300 px-3 py-1.5 font-medium transition-colors hover:bg-gray-50"
+          >
+            Anterior
+          </a>
+        @end
+        @if(alunos.currentPage < alunos.lastPage)
+          <a
+            href="{{ alunos.getUrl(alunos.currentPage + 1) }}"
+            class="rounded-md border border-gray-300 px-3 py-1.5 font-medium transition-colors hover:bg-gray-50"
+          >
+            Próxima
+          </a>
+        @end
+      </div>
+    </div>
+  @end
+@end

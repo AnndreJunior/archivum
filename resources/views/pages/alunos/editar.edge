@@ -1,0 +1,11 @@
+@layouts.app({ title: 'Editar aluno — Archivum', active: 'alunos' })
+  <div class="mx-auto max-w-2xl">
+    <h1 class="text-2xl font-bold text-gray-900">Editar aluno</h1>
+    <p class="mt-1 text-sm text-gray-600">Atualize os dados de {{ aluno.nome }}.</p>
+
+    <div class="mt-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+      @let(formEditar = formAttributes('alunos.update', { id: aluno.id }))
+      @!alunos.form({ acao: formEditar.action, metodo: formEditar.method, aluno: aluno })
+    </div>
+  </div>
+@end

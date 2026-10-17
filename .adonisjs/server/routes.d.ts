@@ -12,24 +12,43 @@ export type ScannedRoutes = {
     'auth.trocar_senha.atualizar': { paramsTuple?: []; params?: {} }
     'auth.logout': { paramsTuple?: []; params?: {} }
     'home': { paramsTuple?: []; params?: {} }
+    'alunos.index': { paramsTuple?: []; params?: {} }
+    'alunos.create': { paramsTuple?: []; params?: {} }
+    'alunos.store': { paramsTuple?: []; params?: {} }
+    'alunos.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'alunos.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'alunos.ativo': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   GET: {
     'auth.login': { paramsTuple?: []; params?: {} }
     'auth.esqueci_senha': { paramsTuple?: []; params?: {} }
     'auth.trocar_senha': { paramsTuple?: []; params?: {} }
     'home': { paramsTuple?: []; params?: {} }
+    'alunos.index': { paramsTuple?: []; params?: {} }
+    'alunos.create': { paramsTuple?: []; params?: {} }
+    'alunos.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   HEAD: {
     'auth.login': { paramsTuple?: []; params?: {} }
     'auth.esqueci_senha': { paramsTuple?: []; params?: {} }
     'auth.trocar_senha': { paramsTuple?: []; params?: {} }
     'home': { paramsTuple?: []; params?: {} }
+    'alunos.index': { paramsTuple?: []; params?: {} }
+    'alunos.create': { paramsTuple?: []; params?: {} }
+    'alunos.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   POST: {
     'auth.login.attempt': { paramsTuple?: []; params?: {} }
     'auth.esqueci_senha.enviar': { paramsTuple?: []; params?: {} }
     'auth.trocar_senha.atualizar': { paramsTuple?: []; params?: {} }
     'auth.logout': { paramsTuple?: []; params?: {} }
+    'alunos.store': { paramsTuple?: []; params?: {} }
+  }
+  PUT: {
+    'alunos.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+  }
+  PATCH: {
+    'alunos.ativo': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {

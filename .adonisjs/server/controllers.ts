@@ -4,6 +4,7 @@
  */
 
 export const controllers = {
+  Aluno: () => import('#controllers/aluno_controller'),
   Auth: () => import('#controllers/auth_controller'),
   RecuperacaoSenha: () => import('#controllers/recuperacao_senha_controller'),
 }
