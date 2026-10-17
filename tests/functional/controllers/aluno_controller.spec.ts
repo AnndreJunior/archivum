@@ -301,6 +301,22 @@ test.group('AlunoController | cadastro', (group) => {
     const aluno = await Aluno.findByOrFail('matricula', dadosAluno.matricula)
     assert.equal(aluno.anoEscolar, 9)
   })
+
+  test('grava o telefone já formatado ao cadastrar', async ({ assert, client }) => {
+    const bibliotecario = await criarBibliotecario()
+
+    const response = await client
+      .post('/alunos')
+      .withCsrfToken()
+      .redirects(0)
+      .loginAs(bibliotecario)
+      .form({ ...dadosAluno, telefone: '11912345678' })
+
+    response.assertStatus(302)
+
+    const aluno = await Aluno.findByOrFail('matricula', dadosAluno.matricula)
+    assert.equal(aluno.telefone, '(11) 91234-5678')
+  })
 })
 
 test.group('AlunoController | edição', (group) => {
@@ -391,6 +407,24 @@ test.group('AlunoController | edição', (group) => {
     await aluno.refresh()
     assert.equal(aluno.nivel, 'fundamental')
     assert.equal(aluno.anoEscolar, 6)
+  })
+
+  test('grava o telefone já formatado ao editar', async ({ assert, client }) => {
+    const aluno = await criarAluno()
+    const bibliotecario = await criarBibliotecario()
+
+    const response = await client
+      .put(`/alunos/${aluno.id}`)
+      .withCsrfToken()
+      .redirects(0)
+      .header('referer', `/alunos/${aluno.id}/editar`)
+      .loginAs(bibliotecario)
+      .form({ ...dadosAluno, telefone: '1134567890' })
+
+    response.assertStatus(302)
+
+    await aluno.refresh()
+    assert.equal(aluno.telefone, '(11) 3456-7890')
   })
 
   test('retorna 404 ao editar um aluno inexistente', async ({ client }) => {
