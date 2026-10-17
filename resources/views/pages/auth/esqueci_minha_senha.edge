@@ -1,0 +1,72 @@
+@layouts.auth({ title: 'Recuperar senha — Archivum' })
+  <div class="w-full max-w-md">
+    <div class="rounded-xl border border-gray-200 bg-white p-8 shadow-sm">
+      <div class="text-center">
+        <span
+          class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-brand/10 text-brand"
+        >
+          @svg('lucide:key-round', { class: 'h-6 w-6' })
+        </span>
+        <h1 class="mt-4 text-2xl font-bold text-gray-900">Recuperar senha</h1>
+        <p class="mt-1 text-sm text-gray-600">
+          Informe o seu e-mail e enviaremos um link para você definir uma nova senha.
+        </p>
+      </div>
+
+      @flashMessage('recuperacaoEnviada')
+        <div
+          class="mt-6 flex items-start gap-3 rounded-md border border-green-200 bg-green-50 p-3 text-sm text-green-700"
+        >
+          @svg('lucide:circle-check', { class: 'mt-0.5 h-4 w-4 shrink-0' })
+          <span>{{ $message }}</span>
+        </div>
+      @end
+
+      @flashMessage('recuperacaoError')
+        <div
+          class="mt-6 flex items-start gap-3 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+        >
+          @svg('lucide:circle-alert', { class: 'mt-0.5 h-4 w-4 shrink-0' })
+          <span>{{ $message }}</span>
+        </div>
+      @end
+
+      <form action="{{ route('auth.esqueci_senha.enviar') }}" method="post" class="mt-6 space-y-4">
+        {{ csrfField() }}
+
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-900">E-mail</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value="{{ old('email', '') }}"
+            autocomplete="email"
+            required
+            autofocus
+            class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/30"
+          />
+          @inputError('email')
+            @each(message in $messages)
+              <p class="mt-1 text-sm text-red-600">{{ message }}</p>
+            @end
+          @end
+        </div>
+
+        <button
+          type="submit"
+          class="flex w-full items-center justify-center gap-2 rounded-md bg-brand px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand/90"
+        >
+          @svg('lucide:send', { class: 'h-4 w-4' })
+          Enviar link
+        </button>
+      </form>
+
+      <div class="mt-6 text-center">
+        <a href="{{ route('auth.login') }}" class="text-sm font-medium text-brand hover:underline">
+          Voltar para o login
+        </a>
+      </div>
+    </div>
+  </div>
+@end
