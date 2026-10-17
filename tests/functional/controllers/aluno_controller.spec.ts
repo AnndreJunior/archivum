@@ -253,6 +253,54 @@ test.group('AlunoController | cadastro', (group) => {
     assert.isNull(aluno.email)
     assert.isNull(aluno.telefone)
   })
+
+  test('rejeita aluno do ensino médio com ano escolar maior que 3', async ({ assert, client }) => {
+    const bibliotecario = await criarBibliotecario()
+
+    const response = await client
+      .post('/alunos')
+      .withCsrfToken()
+      .redirects(0)
+      .header('referer', '/alunos/criar')
+      .loginAs(bibliotecario)
+      .form({ ...dadosAluno, nivel: 'medio', anoEscolar: 4 })
+
+    response.assertStatus(302)
+    assert.property(response.flashMessage('inputErrorsBag'), 'anoEscolar')
+    assert.lengthOf(await Aluno.all(), 0)
+  })
+
+  test('aceita aluno do ensino médio até o terceiro ano', async ({ assert, client }) => {
+    const bibliotecario = await criarBibliotecario()
+
+    const response = await client
+      .post('/alunos')
+      .withCsrfToken()
+      .redirects(0)
+      .loginAs(bibliotecario)
+      .form({ ...dadosAluno, nivel: 'medio', anoEscolar: 3 })
+
+    response.assertStatus(302)
+
+    const aluno = await Aluno.findByOrFail('matricula', dadosAluno.matricula)
+    assert.equal(aluno.anoEscolar, 3)
+  })
+
+  test('permite ano escolar alto no ensino fundamental', async ({ assert, client }) => {
+    const bibliotecario = await criarBibliotecario()
+
+    const response = await client
+      .post('/alunos')
+      .withCsrfToken()
+      .redirects(0)
+      .loginAs(bibliotecario)
+      .form({ ...dadosAluno, nivel: 'fundamental', anoEscolar: 9 })
+
+    response.assertStatus(302)
+
+    const aluno = await Aluno.findByOrFail('matricula', dadosAluno.matricula)
+    assert.equal(aluno.anoEscolar, 9)
+  })
 })
 
 test.group('AlunoController | edição', (group) => {
@@ -320,6 +368,29 @@ test.group('AlunoController | edição', (group) => {
 
     response.assertStatus(302)
     assert.property(response.flashMessage('inputErrorsBag'), 'matricula')
+  })
+
+  test('rejeita editar um aluno para o ensino médio em ano escolar maior que 3', async ({
+    assert,
+    client,
+  }) => {
+    const aluno = await criarAluno()
+    const bibliotecario = await criarBibliotecario()
+
+    const response = await client
+      .put(`/alunos/${aluno.id}`)
+      .withCsrfToken()
+      .redirects(0)
+      .header('referer', `/alunos/${aluno.id}/editar`)
+      .loginAs(bibliotecario)
+      .form({ ...dadosAluno, nivel: 'medio', anoEscolar: 4 })
+
+    response.assertStatus(302)
+    assert.property(response.flashMessage('inputErrorsBag'), 'anoEscolar')
+
+    await aluno.refresh()
+    assert.equal(aluno.nivel, 'fundamental')
+    assert.equal(aluno.anoEscolar, 6)
   })
 
   test('retorna 404 ao editar um aluno inexistente', async ({ client }) => {
