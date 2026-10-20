@@ -217,6 +217,22 @@ test.group('LivroController | cadastro', (group) => {
     assert.lengthOf(livro.autores, 0)
   })
 
+  test('formata o ISBN antes de gravar', async ({ assert, client }) => {
+    const bibliotecario = await criarBibliotecario()
+
+    const response = await client
+      .post('/livros')
+      .withCsrfToken()
+      .redirects(0)
+      .loginAs(bibliotecario)
+      .form({ ...dadosLivro, isbn: '9788535902775' })
+
+    response.assertStatus(302)
+
+    const livro = await Livro.findByOrFail('isbn', '978-85-359-0277-5')
+    assert.equal(livro.isbn, '978-85-359-0277-5')
+  })
+
   test('grava campos opcionais vazios como nulos', async ({ assert, client }) => {
     const bibliotecario = await criarBibliotecario()
 
@@ -267,6 +283,23 @@ test.group('LivroController | cadastro', (group) => {
       .header('referer', '/livros/criar')
       .loginAs(bibliotecario)
       .form(dadosLivro)
+
+    response.assertStatus(302)
+    assert.property(response.flashMessage('inputErrorsBag'), 'isbn')
+    assert.lengthOf(await Livro.all(), 1)
+  })
+
+  test('rejeita ISBN já cadastrado mesmo sem formatação', async ({ assert, client }) => {
+    await criarLivro({ isbn: dadosLivro.isbn })
+    const bibliotecario = await criarBibliotecario()
+
+    const response = await client
+      .post('/livros')
+      .withCsrfToken()
+      .redirects(0)
+      .header('referer', '/livros/criar')
+      .loginAs(bibliotecario)
+      .form({ ...dadosLivro, isbn: '9788535902775' })
 
     response.assertStatus(302)
     assert.property(response.flashMessage('inputErrorsBag'), 'isbn')
