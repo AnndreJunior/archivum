@@ -78,9 +78,43 @@ bibliotecário e o empréstimo é registrado ali.
    código de produção está errado.
 8. **Peça revisão do código de produção** antes de commitar (`feat:`/`fix:`/`refactor:`).
 
-- Commits seguem **Conventional Commits** (ex.: `feat:`, `fix:`, `test:`, `refactor:`).
-- Por enquanto, trabalhe **direto na `main`** (sem branches).
+### Commits
+
+- Seguem **Conventional Commits** (ex.: `feat:`, `fix:`, `test:`, `refactor:`, `docs:`),
+  com **assunto e corpo em português**; apenas o prefixo do tipo permanece em inglês
+  (ex.: `feat: permite renovar empréstimo no balcão`).
+- Um commit por etapa do TDD: primeiro os testes (`test: ...`), depois a implementação
+  (`feat: ...`/`fix: ...`). **Não misture teste e código de produção no mesmo commit.**
+- Commits pequenos e coesos; evite mensagens genéricas como "wip", "ajustes" ou "correções".
 - **Nunca commite sem revisão** (de teste ou de produção).
+- Nunca versione segredos, `.env`, `node_modules/` ou artefatos de build.
+
+### Branches e Pull Requests
+
+- **Nunca trabalhe direto na `main`.** Toda funcionalidade (ou correção) começa em uma
+  **branch nova**, criada a partir da `main` atualizada:
+  `git switch main && git pull && git switch -c <tipo>/<descricao>`.
+- Nome da branch em kebab-case, com o tipo como prefixo: `feat/emprestimo-renovacao`,
+  `fix/bloqueio-por-atraso`, `refactor/...`, `docs/...`.
+- Uma branch = uma entrega. Não misture funcionalidades nem refatorações não relacionadas
+  na mesma branch/PR.
+- Antes de abrir a PR, garanta a suíte verde (`node ace test`) e, quando aplicável,
+  `npm run lint` e `npm run typecheck`. Não abra PR com testes falhando.
+- Ao concluir (testes verdes e revisão aprovada), faça push da branch e abra a **Pull
+  Request com o GitHub CLI** (`gh pr create --base main`), não pelo navegador. Confirme a
+  autenticação antes com `gh auth status`.
+- A descrição da PR deve ser **detalhada**, explicando bem o que foi feito:
+  - resumo da funcionalidade e motivação;
+  - regras de negócio, rotas/controllers, models, tabelas e migrations afetadas;
+  - decisões de implementação relevantes e o que ficou de fora;
+  - testes adicionados/alterados e comandos executados com o resultado;
+  - passos manuais para validar (ex.: `docker compose up -d --build`);
+  - `Closes #<issue>` quando houver issue correspondente.
+- Para descrições longas, escreva o corpo em um arquivo e use `gh pr create --body-file <arquivo>`.
+- Ajustes pedidos na revisão vão em **novos commits na mesma branch** (o push atualiza a
+  PR automaticamente); não abra outra PR para o mesmo assunto.
+- Só faça merge, feche a PR e apague a branch (`git push origin --delete <branch>`) com
+  autorização do usuário.
 
 ### Views (Edge)
 
