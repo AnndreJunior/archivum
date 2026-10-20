@@ -1,0 +1,330 @@
+{{--
+  Partial do formulário de livro.
+
+  Props:
+    acao                  - URL de submissão (formAttributes(...).action). Quando o
+                            método não é GET/POST, o _method já vem na query string.
+    metodo                - Método HTML do formulário (formAttributes(...).method).
+    livro                 - Livro sendo editado (opcional).
+    autores               - Autores disponíveis para o modal, no formato { id, nome }.
+    selecionadosIniciais  - IDs dos autores já associados ao livro (opcional).
+--}}
+@let(livro = $props.get('livro'))
+@let(acao = $props.get('acao'))
+@let(metodo = $props.get('metodo'))
+@let(autores = $props.get('autores') ?? [])
+@let(selecionadosServidor = $props.get('selecionadosIniciais') ?? [])
+@let(selecionadosIniciais = old('autores', selecionadosServidor))
+
+<div
+  x-data="seletorAutores({
+    autoresIniciais: {{ JSON.stringify(autores) }},
+    selecionadosIniciais: {{ JSON.stringify(selecionadosIniciais) }}
+  })"
+  data-url-autores="{{ route('autores.store') }}"
+>
+  <form action="{{ acao }}" method="{{ metodo ?? 'post' }}" class="space-y-5">
+    {{ csrfField() }}
+
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+      <div class="sm:col-span-2">
+        <label for="titulo" class="block text-sm font-medium text-gray-900">Título</label>
+        <input
+          type="text"
+          id="titulo"
+          name="titulo"
+          value="{{ old('titulo', livro ? livro.titulo : '') }}"
+          maxlength="200"
+          required
+          autofocus
+          class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/30"
+        />
+        @inputError('titulo')
+          @each(message in $messages)
+            <p class="mt-1 text-sm text-red-600">{{ message }}</p>
+          @end
+        @end
+      </div>
+
+      <div>
+        <label for="isbn" class="block text-sm font-medium text-gray-900">
+          ISBN <span class="text-gray-400">(opcional)</span>
+        </label>
+        <input
+          type="text"
+          id="isbn"
+          name="isbn"
+          value="{{ old('isbn', livro ? (livro.isbn ?? '') : '') }}"
+          maxlength="20"
+          class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/30"
+        />
+        @inputError('isbn')
+          @each(message in $messages)
+            <p class="mt-1 text-sm text-red-600">{{ message }}</p>
+          @end
+        @end
+      </div>
+
+      <div>
+        <label for="editora" class="block text-sm font-medium text-gray-900">
+          Editora <span class="text-gray-400">(opcional)</span>
+        </label>
+        <input
+          type="text"
+          id="editora"
+          name="editora"
+          value="{{ old('editora', livro ? (livro.editora ?? '') : '') }}"
+          maxlength="120"
+          class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/30"
+        />
+        @inputError('editora')
+          @each(message in $messages)
+            <p class="mt-1 text-sm text-red-600">{{ message }}</p>
+          @end
+        @end
+      </div>
+
+      <div>
+        <label for="anoPublicacao" class="block text-sm font-medium text-gray-900">
+          Ano de publicação <span class="text-gray-400">(opcional)</span>
+        </label>
+        <input
+          type="number"
+          id="anoPublicacao"
+          name="anoPublicacao"
+          value="{{ old('anoPublicacao', livro ? (livro.anoPublicacao ?? '') : '') }}"
+          min="1"
+          max="9999"
+          class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/30"
+        />
+        @inputError('anoPublicacao')
+          @each(message in $messages)
+            <p class="mt-1 text-sm text-red-600">{{ message }}</p>
+          @end
+        @end
+      </div>
+
+      <div class="sm:col-span-2">
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <span class="block text-sm font-medium text-gray-900">Autores</span>
+            <span class="text-xs text-gray-500">
+              Selecione um ou mais autores da obra.
+            </span>
+          </div>
+
+          <button
+            type="button"
+            @click="abrir()"
+            class="inline-flex items-center justify-center gap-2 rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+          >
+            @svg('lucide:users', { class: 'h-4 w-4' })
+            Selecionar autores
+          </button>
+        </div>
+
+        <div class="mt-3 flex min-h-10 flex-wrap items-center gap-2 rounded-md border border-gray-200 bg-gray-50 p-3">
+          <template x-for="autor in autoresSelecionados" :key="autor.id">
+            <span
+              class="inline-flex items-center gap-1 rounded-full bg-brand/10 px-2.5 py-1 text-xs font-medium text-brand"
+            >
+              <span x-text="autor.nome"></span>
+              <button
+                type="button"
+                @click="alternar(autor.id)"
+                class="cursor-pointer text-brand/70 hover:text-brand"
+                aria-label="Remover autor"
+              >
+                @svg('lucide:x', { class: 'h-3 w-3' })
+              </button>
+            </span>
+          </template>
+
+          <span x-show="selecionados.length === 0" class="text-sm text-gray-500">
+            Nenhum autor selecionado.
+          </span>
+        </div>
+
+        {{-- Com JS desabilitado, estes campos continuam enviando a seleção atual. --}}
+        <div x-ref="inputsServidor" class="hidden">
+          @each(id in selecionadosIniciais)
+            <input type="hidden" name="autores[]" value="{{ id }}" />
+          @end
+        </div>
+
+        {{-- Com Alpine ativo, a seleção é sincronizada por aqui. --}}
+        <template x-for="id in selecionados" :key="id">
+          <input type="hidden" name="autores[]" :value="id" />
+        </template>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3 pt-2">
+      <button
+        type="submit"
+        class="inline-flex items-center gap-2 rounded-md bg-brand px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand/90"
+      >
+        @svg('lucide:check', { class: 'h-4 w-4' })
+        Salvar
+      </button>
+      <a
+        href="{{ route('livros.index') }}"
+        class="text-sm font-medium text-gray-600 hover:text-gray-900"
+      >
+        Cancelar
+      </a>
+    </div>
+  </form>
+
+  <div
+    x-show="aberto"
+    x-cloak
+    class="fixed inset-0 z-50 overflow-y-auto"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="titulo-modal-autores"
+    @keydown.escape.window="fechar()"
+  >
+    <div class="fixed inset-0 bg-gray-900/50" @click="fechar()"></div>
+
+    <div class="relative mx-auto mt-16 w-full max-w-lg px-4">
+      <div class="rounded-xl border border-gray-200 bg-white shadow-xl">
+        <div class="flex items-center justify-between border-b border-gray-200 px-6 py-4">
+          <h2 id="titulo-modal-autores" class="text-lg font-semibold text-gray-900">
+            <span x-show="modo === 'lista'">Autores</span>
+            <span x-show="modo === 'cadastro'">Cadastrar autor</span>
+          </h2>
+
+          <button
+            type="button"
+            @click="fechar()"
+            class="cursor-pointer rounded-md p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+            aria-label="Fechar"
+          >
+            @svg('lucide:x', { class: 'h-5 w-5' })
+          </button>
+        </div>
+
+        <div class="px-6 py-5">
+          <div x-show="modo === 'lista'">
+            <label for="busca-autores" class="block text-sm font-medium text-gray-900">
+              Pesquisar autor
+            </label>
+            <input
+              type="text"
+              id="busca-autores"
+              x-model="busca"
+              x-ref="busca"
+              placeholder="Digite o nome do autor"
+              class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/30"
+            />
+
+            <p
+              x-show="mensagem"
+              x-text="mensagem"
+              class="mt-3 rounded-md border border-green-200 bg-green-50 p-3 text-sm text-green-700"
+            ></p>
+
+            <div class="mt-3 max-h-72 overflow-y-auto rounded-md border border-gray-200">
+              <template x-for="autor in autoresFiltrados" :key="autor.id">
+                <label
+                  class="flex cursor-pointer items-center gap-3 border-b border-gray-100 px-3 py-2.5 text-sm text-gray-800 last:border-b-0 hover:bg-gray-50"
+                >
+                  <input
+                    type="checkbox"
+                    class="h-4 w-4 rounded border-gray-300 text-brand focus:ring-brand/30"
+                    :checked="estaSelecionado(autor.id)"
+                    @change="alternar(autor.id)"
+                  />
+                  <span x-text="autor.nome"></span>
+                </label>
+              </template>
+
+              <p
+                x-show="autoresFiltrados.length === 0"
+                class="px-3 py-8 text-center text-sm text-gray-500"
+              >
+                Nenhum autor encontrado.
+              </p>
+            </div>
+
+            <div class="mt-5 flex flex-col-reverse gap-3 border-t border-gray-200 pt-4 sm:flex-row sm:items-center sm:justify-between">
+              <button
+                type="button"
+                @click="irParaCadastro()"
+                class="inline-flex items-center justify-center gap-2 rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+              >
+                @svg('lucide:user-plus', { class: 'h-4 w-4' })
+                Cadastrar autor
+              </button>
+
+              <button
+                type="button"
+                @click="fechar()"
+                class="inline-flex items-center justify-center gap-2 rounded-md bg-brand px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand/90"
+              >
+                @svg('lucide:check', { class: 'h-4 w-4' })
+                Concluir
+              </button>
+            </div>
+          </div>
+
+          <div x-show="modo === 'cadastro'">
+            <button
+              type="button"
+              @click="voltarParaLista()"
+              class="inline-flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-gray-900"
+            >
+              @svg('lucide:arrow-left', { class: 'h-4 w-4' })
+              Voltar para a lista
+            </button>
+
+            <form class="mt-4 space-y-4" @submit.prevent="cadastrarAutor()">
+              <div>
+                <label for="nome-autor" class="block text-sm font-medium text-gray-900">
+                  Nome
+                </label>
+                <input
+                  type="text"
+                  id="nome-autor"
+                  x-model="novoNome"
+                  x-ref="nomeAutor"
+                  maxlength="120"
+                  required
+                  class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/30"
+                />
+                <template x-for="erro in (errosAutor.nome ?? [])" :key="erro">
+                  <p class="mt-1 text-sm text-red-600" x-text="erro"></p>
+                </template>
+              </div>
+
+              <p
+                x-show="erroGeral"
+                x-text="erroGeral"
+                class="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+              ></p>
+
+              <div class="flex items-center gap-3 pt-1">
+                <button
+                  type="submit"
+                  :disabled="salvando"
+                  class="inline-flex items-center gap-2 rounded-md bg-brand px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand/90 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  @svg('lucide:check', { class: 'h-4 w-4' })
+                  <span x-text="salvando ? 'Cadastrando...' : 'Cadastrar autor'"></span>
+                </button>
+                <button
+                  type="button"
+                  @click="voltarParaLista()"
+                  class="text-sm font-medium text-gray-600 hover:text-gray-900"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

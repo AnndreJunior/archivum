@@ -18,6 +18,13 @@ export type ScannedRoutes = {
     'alunos.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'alunos.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'alunos.ativo': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'livros.index': { paramsTuple?: []; params?: {} }
+    'livros.create': { paramsTuple?: []; params?: {} }
+    'livros.store': { paramsTuple?: []; params?: {} }
+    'livros.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'livros.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'autores.store': { paramsTuple?: []; params?: {} }
+    'autores.create': { paramsTuple?: []; params?: {} }
   }
   GET: {
     'auth.login': { paramsTuple?: []; params?: {} }
@@ -27,6 +34,10 @@ export type ScannedRoutes = {
     'alunos.index': { paramsTuple?: []; params?: {} }
     'alunos.create': { paramsTuple?: []; params?: {} }
     'alunos.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'livros.index': { paramsTuple?: []; params?: {} }
+    'livros.create': { paramsTuple?: []; params?: {} }
+    'livros.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'autores.create': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
     'auth.login': { paramsTuple?: []; params?: {} }
@@ -36,6 +47,10 @@ export type ScannedRoutes = {
     'alunos.index': { paramsTuple?: []; params?: {} }
     'alunos.create': { paramsTuple?: []; params?: {} }
     'alunos.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'livros.index': { paramsTuple?: []; params?: {} }
+    'livros.create': { paramsTuple?: []; params?: {} }
+    'livros.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'autores.create': { paramsTuple?: []; params?: {} }
   }
   POST: {
     'auth.login.attempt': { paramsTuple?: []; params?: {} }
@@ -43,9 +58,12 @@ export type ScannedRoutes = {
     'auth.trocar_senha.atualizar': { paramsTuple?: []; params?: {} }
     'auth.logout': { paramsTuple?: []; params?: {} }
     'alunos.store': { paramsTuple?: []; params?: {} }
+    'livros.store': { paramsTuple?: []; params?: {} }
+    'autores.store': { paramsTuple?: []; params?: {} }
   }
   PUT: {
     'alunos.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'livros.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PATCH: {
     'alunos.ativo': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

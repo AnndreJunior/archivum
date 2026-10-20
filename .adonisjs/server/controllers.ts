@@ -6,5 +6,7 @@
 export const controllers = {
   Aluno: () => import('#controllers/aluno_controller'),
   Auth: () => import('#controllers/auth_controller'),
+  Autor: () => import('#controllers/autor_controller'),
+  Livro: () => import('#controllers/livro_controller'),
   RecuperacaoSenha: () => import('#controllers/recuperacao_senha_controller'),
 }

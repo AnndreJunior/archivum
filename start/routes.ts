@@ -13,6 +13,8 @@ import router from '@adonisjs/core/services/router'
 const AuthController = () => import('#controllers/auth_controller')
 const RecuperacaoSenhaController = () => import('#controllers/recuperacao_senha_controller')
 const AlunoController = () => import('#controllers/aluno_controller')
+const LivroController = () => import('#controllers/livro_controller')
+const AutorController = () => import('#controllers/autor_controller')
 
 /**
  * Autenticação — rotas públicas (acessíveis sem sessão).
@@ -78,5 +80,27 @@ router
       .where('id', /^[0-9]+$/)
       .use(middleware.admin())
       .as('alunos.ativo')
+  })
+  .use(middleware.auth())
+
+/**
+ * Livros (exigem autenticação).
+ */
+router
+  .group(() => {
+    router.get('/livros', [LivroController, 'index']).as('livros.index')
+    router.get('/livros/criar', [LivroController, 'create']).as('livros.create')
+    router.post('/livros', [LivroController, 'store']).as('livros.store')
+    router
+      .get('/livros/:id/editar', [LivroController, 'edit'])
+      .where('id', /^[0-9]+$/)
+      .as('livros.edit')
+    router
+      .put('/livros/:id', [LivroController, 'update'])
+      .where('id', /^[0-9]+$/)
+      .as('livros.update')
+
+    router.post('/autores', [AutorController, 'store']).as('autores.store')
+    router.get('/autores/criar', [AutorController, 'create']).as('autores.create')
   })
   .use(middleware.auth())

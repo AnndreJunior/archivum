@@ -1,4 +1,7 @@
 import Alpine from 'alpinejs'
+import { seletorAutores } from './seletor-autores.js'
+
+Alpine.data('seletorAutores', seletorAutores)
 
 Alpine.data('alert', function () {
   return {

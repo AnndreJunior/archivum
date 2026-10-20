@@ -3,3 +3,7 @@
 @theme {
   --color-brand: #00314d;
 }
+
+[x-cloak] {
+  display: none !important;
+}
