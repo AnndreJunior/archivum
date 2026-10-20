@@ -43,10 +43,12 @@ o volume do banco).
    cp .env.example .env
    node ace generate:key
    ```
-3. Suba apenas o banco:
+3. Suba o banco e o smtp4dev (servidor de e-mails de desenvolvimento):
    ```sh
-   docker compose up -d db
+   docker compose up -d db smtp4dev
    ```
+   O smtp4dev recebe e-mails em `localhost:2525` e expõe a caixa de entrada em
+   <http://localhost:5000>.
 4. Rode as migrations e inicie o servidor de desenvolvimento:
    ```sh
    node ace migration:run
