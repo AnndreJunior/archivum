@@ -2,12 +2,12 @@
   Partial do formulário de livro.
 
   Props:
-    acao                  - URL de submissão (formAttributes(...).action). Quando o
-                            método não é GET/POST, o _method já vem na query string.
-    metodo                - Método HTML do formulário (formAttributes(...).method).
-    livro                 - Livro sendo editado (opcional).
-    autores               - Autores disponíveis para o modal, no formato { id, nome }.
-    selecionadosIniciais  - IDs dos autores já associados ao livro (opcional).
+  acao                  - URL de submissão (formAttributes(...).action). Quando o
+  método não é GET/POST, o _method já vem na query string.
+  metodo                - Método HTML do formulário (formAttributes(...).method).
+  livro                 - Livro sendo editado (opcional).
+  autores               - Autores disponíveis para o modal, no formato { id, nome }.
+  selecionadosIniciais  - IDs dos autores já associados ao livro (opcional).
 --}}
 @let(livro = $props.get('livro'))
 @let(acao = $props.get('acao'))
@@ -20,12 +20,11 @@
   x-data="seletorAutores({
     autoresIniciais: {{ JSON.stringify(autores) }},
     selecionadosIniciais: {{ JSON.stringify(selecionadosIniciais) }}
-  })"
+    })"
   data-url-autores="{{ route('autores.store') }}"
 >
   <form action="{{ acao }}" method="{{ metodo ?? 'post' }}" class="space-y-5">
     {{ csrfField() }}
-
     <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
       <div class="sm:col-span-2">
         <label for="titulo" class="block text-sm font-medium text-gray-900">Título</label>
@@ -48,7 +47,8 @@
 
       <div>
         <label for="isbn" class="block text-sm font-medium text-gray-900">
-          ISBN <span class="text-gray-400">(opcional)</span>
+          ISBN
+          <span class="text-gray-400">(opcional)</span>
         </label>
         <input
           type="text"
@@ -67,7 +67,8 @@
 
       <div>
         <label for="editora" class="block text-sm font-medium text-gray-900">
-          Editora <span class="text-gray-400">(opcional)</span>
+          Editora
+          <span class="text-gray-400">(opcional)</span>
         </label>
         <input
           type="text"
@@ -86,7 +87,8 @@
 
       <div>
         <label for="anoPublicacao" class="block text-sm font-medium text-gray-900">
-          Ano de publicação <span class="text-gray-400">(opcional)</span>
+          Ano de publicação
+          <span class="text-gray-400">(opcional)</span>
         </label>
         <input
           type="number"
@@ -108,9 +110,7 @@
         <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <span class="block text-sm font-medium text-gray-900">Autores</span>
-            <span class="text-xs text-gray-500">
-              Selecione um ou mais autores da obra.
-            </span>
+            <span class="text-xs text-gray-500">Selecione um ou mais autores da obra.</span>
           </div>
 
           <button
@@ -123,7 +123,9 @@
           </button>
         </div>
 
-        <div class="mt-3 flex min-h-10 flex-wrap items-center gap-2 rounded-md border border-gray-200 bg-gray-50 p-3">
+        <div
+          class="mt-3 flex min-h-10 flex-wrap items-center gap-2 rounded-md border border-gray-200 bg-gray-50 p-3"
+        >
           <template x-for="autor in autoresSelecionados" :key="autor.id">
             <span
               class="inline-flex items-center gap-1 rounded-full bg-brand/10 px-2.5 py-1 text-xs font-medium text-brand"
@@ -139,19 +141,16 @@
               </button>
             </span>
           </template>
-
           <span x-show="selecionados.length === 0" class="text-sm text-gray-500">
             Nenhum autor selecionado.
           </span>
         </div>
-
         {{-- Com JS desabilitado, estes campos continuam enviando a seleção atual. --}}
         <div x-ref="inputsServidor" class="hidden">
           @each(id in selecionadosIniciais)
             <input type="hidden" name="autores[]" value="{{ id }}" />
           @end
         </div>
-
         {{-- Com Alpine ativo, a seleção é sincronizada por aqui. --}}
         <template x-for="id in selecionados" :key="id">
           <input type="hidden" name="autores[]" :value="id" />
@@ -248,7 +247,9 @@
               </p>
             </div>
 
-            <div class="mt-5 flex flex-col-reverse gap-3 border-t border-gray-200 pt-4 sm:flex-row sm:items-center sm:justify-between">
+            <div
+              class="mt-5 flex flex-col-reverse gap-3 border-t border-gray-200 pt-4 sm:flex-row sm:items-center sm:justify-between"
+            >
               <button
                 type="button"
                 @click="irParaCadastro()"
@@ -257,7 +258,6 @@
                 @svg('lucide:user-plus', { class: 'h-4 w-4' })
                 Cadastrar autor
               </button>
-
               <button
                 type="button"
                 @click="fechar()"
@@ -281,9 +281,7 @@
 
             <form class="mt-4 space-y-4" @submit.prevent="cadastrarAutor()">
               <div>
-                <label for="nome-autor" class="block text-sm font-medium text-gray-900">
-                  Nome
-                </label>
+                <label for="nome-autor" class="block text-sm font-medium text-gray-900">Nome</label>
                 <input
                   type="text"
                   id="nome-autor"

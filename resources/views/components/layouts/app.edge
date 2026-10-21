@@ -7,7 +7,12 @@
     @if(csrfMeta)
       {{ csrfMeta() }}
     @end
-    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/mascara-telefone.js', 'resources/js/mascara-isbn.js'])
+    @vite([
+      'resources/css/app.css',
+      'resources/js/app.js',
+      'resources/js/mascara-telefone.js',
+      'resources/js/mascara-isbn.js',
+    ])
   </head>
   <body class="min-h-screen bg-white text-gray-900">
     @let(active = $props.get('active'))
@@ -37,7 +42,6 @@
             </a>
           @end
         </nav>
-
         {{-- O csrfField só existe quando o Shield roda (rotas registradas); em páginas de erro (404) ele não é compartilhado. --}}
         @if(csrfField)
           <form action="{{ route('auth.logout') }}" method="post">
@@ -54,8 +58,6 @@
       </div>
     </header>
 
-    <main class="mx-auto max-w-6xl px-6 py-10">
-      {{{ await $slots.main() }}}
-    </main>
+    <main class="mx-auto max-w-6xl px-6 py-10">{{{ await $slots.main() }}}</main>
   </body>
 </html>

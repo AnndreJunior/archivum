@@ -2,10 +2,10 @@
   Partial do formulário de aluno.
 
   Props:
-    acao   - URL de submissão (formAttributes(...).action). Quando o método não
-             é GET/POST, o _method já vem na query string do action.
-    metodo - Método HTML do formulário (formAttributes(...).method).
-    aluno  - Aluno sendo editado (opcional).
+  acao   - URL de submissão (formAttributes(...).action). Quando o método não
+  é GET/POST, o _method já vem na query string do action.
+  metodo - Método HTML do formulário (formAttributes(...).method).
+  aluno  - Aluno sendo editado (opcional).
 --}}
 @let(aluno = $props.get('aluno'))
 @let(acao = $props.get('acao'))
@@ -13,7 +13,6 @@
 
 <form action="{{ acao }}" method="{{ metodo ?? 'post' }}" class="space-y-5">
   {{ csrfField() }}
-
   <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
     <div class="sm:col-span-2">
       <label for="nome" class="block text-sm font-medium text-gray-900">Nome</label>
@@ -119,7 +118,8 @@
 
     <div>
       <label for="email" class="block text-sm font-medium text-gray-900">
-        E-mail <span class="text-gray-400">(opcional)</span>
+        E-mail
+        <span class="text-gray-400">(opcional)</span>
       </label>
       <input
         type="email"
@@ -137,7 +137,8 @@
 
     <div>
       <label for="telefone" class="block text-sm font-medium text-gray-900">
-        Telefone <span class="text-gray-400">(opcional)</span>
+        Telefone
+        <span class="text-gray-400">(opcional)</span>
       </label>
       <input
         type="tel"
