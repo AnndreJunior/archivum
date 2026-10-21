@@ -5,10 +5,7 @@
  * navegador. O cadastro de um novo autor é enviado por `fetch` para que o
  * formulário do livro não seja recarregado e a seleção atual seja preservada.
  */
-export function seletorAutores({
-  autoresIniciais = [],
-  selecionadosIniciais = [],
-} = {}) {
+export function seletorAutores({ autoresIniciais = [], selecionadosIniciais = [] } = {}) {
   return {
     aberto: false,
     modo: 'lista',

@@ -20,12 +20,9 @@ export function formatarIsbn(valor) {
     return [digitos.slice(0, 3), digitos.slice(3, 5), digitos.slice(5)].join('-')
   }
   if (digitos.length <= 12) {
-    return [
-      digitos.slice(0, 3),
-      digitos.slice(3, 5),
-      digitos.slice(5, 8),
-      digitos.slice(8),
-    ].join('-')
+    return [digitos.slice(0, 3), digitos.slice(3, 5), digitos.slice(5, 8), digitos.slice(8)].join(
+      '-'
+    )
   }
   return [
     digitos.slice(0, 3),

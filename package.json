@@ -89,5 +89,5 @@
     "esbuild": true,
     "fsevents": true
   },
-  "prettier": "@adonisjs/prettier-config"
+  "prettier": "./prettier.config.mjs"
 }
