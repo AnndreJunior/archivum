@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: Qualidade e testes
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      CI: true
+      TZ: UTC
+      HOST: localhost
+      PORT: 3333
+      LOG_LEVEL: info
+      APP_KEY: ci-only-archivum-app-key-0123456
+      APP_URL: http://localhost:3333
+      SESSION_DRIVER: memory
+      ADMIN_NOME: Administrador do Sistema
+      ADMIN_MATRICULA: ADM001
+      ADMIN_EMAIL: admin@archivum.test
+      ADMIN_SENHA: admin-test-123
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_USER: archivum
+      DB_PASSWORD: archivum
+      DB_DATABASE: archivum_test
+      MAIL_MAILER: smtp
+      MAIL_FROM_NAME: Archivum
+      MAIL_FROM_ADDRESS: noreply@archivum.test
+      SMTP_HOST: localhost
+      SMTP_PORT: 2525
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ vars.NODE_VERSION }}
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Verificar formatação
+        run: npx --no-install prettier --check .
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Testes
+        run: npm test
+        env:
+          NODE_ENV: test
