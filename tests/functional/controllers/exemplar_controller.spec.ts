@@ -368,7 +368,8 @@ test.group('ExemplarController | cadastro', (group) => {
       .form({ livroId: livro.id, ...dadosExemplar })
 
     response.assertStatus(302)
-    assert.property(response.flashMessage('inputErrorsBag'), 'codigo')
+    const erros = response.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(erros.codigo, 'Este código já está cadastrado.')
     assert.lengthOf(await Exemplar.all(), 1)
   })
 
@@ -469,7 +470,8 @@ test.group('ExemplarController | edição', (group) => {
       .form({ livroId: livro.id, codigo: 'EX-0002', situacao: 'disponivel' })
 
     response.assertStatus(302)
-    assert.property(response.flashMessage('inputErrorsBag'), 'codigo')
+    const erros = response.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(erros.codigo, 'Este código já está cadastrado.')
 
     await exemplar.refresh()
     assert.equal(exemplar.codigo, 'EX-0001')
