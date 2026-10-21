@@ -25,6 +25,12 @@ export type ScannedRoutes = {
     'livros.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'autores.store': { paramsTuple?: []; params?: {} }
     'autores.create': { paramsTuple?: []; params?: {} }
+    'exemplares.index': { paramsTuple?: []; params?: {} }
+    'exemplares.create': { paramsTuple?: []; params?: {} }
+    'exemplares.store': { paramsTuple?: []; params?: {} }
+    'exemplares.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'exemplares.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'exemplares.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   GET: {
     'auth.login': { paramsTuple?: []; params?: {} }
@@ -38,6 +44,9 @@ export type ScannedRoutes = {
     'livros.create': { paramsTuple?: []; params?: {} }
     'livros.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'autores.create': { paramsTuple?: []; params?: {} }
+    'exemplares.index': { paramsTuple?: []; params?: {} }
+    'exemplares.create': { paramsTuple?: []; params?: {} }
+    'exemplares.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   HEAD: {
     'auth.login': { paramsTuple?: []; params?: {} }
@@ -51,6 +60,9 @@ export type ScannedRoutes = {
     'livros.create': { paramsTuple?: []; params?: {} }
     'livros.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'autores.create': { paramsTuple?: []; params?: {} }
+    'exemplares.index': { paramsTuple?: []; params?: {} }
+    'exemplares.create': { paramsTuple?: []; params?: {} }
+    'exemplares.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   POST: {
     'auth.login.attempt': { paramsTuple?: []; params?: {} }
@@ -60,13 +72,18 @@ export type ScannedRoutes = {
     'alunos.store': { paramsTuple?: []; params?: {} }
     'livros.store': { paramsTuple?: []; params?: {} }
     'autores.store': { paramsTuple?: []; params?: {} }
+    'exemplares.store': { paramsTuple?: []; params?: {} }
   }
   PUT: {
     'alunos.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'livros.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'exemplares.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PATCH: {
     'alunos.ativo': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+  }
+  DELETE: {
+    'exemplares.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {

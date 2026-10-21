@@ -15,6 +15,7 @@ const RecuperacaoSenhaController = () => import('#controllers/recuperacao_senha_
 const AlunoController = () => import('#controllers/aluno_controller')
 const LivroController = () => import('#controllers/livro_controller')
 const AutorController = () => import('#controllers/autor_controller')
+const ExemplarController = () => import('#controllers/exemplar_controller')
 
 /**
  * Autenticação — rotas públicas (acessíveis sem sessão).
@@ -102,5 +103,28 @@ router
 
     router.post('/autores', [AutorController, 'store']).as('autores.store')
     router.get('/autores/criar', [AutorController, 'create']).as('autores.create')
+  })
+  .use(middleware.auth())
+
+/**
+ * Exemplares (exigem autenticação).
+ */
+router
+  .group(() => {
+    router.get('/exemplares', [ExemplarController, 'index']).as('exemplares.index')
+    router.get('/exemplares/criar', [ExemplarController, 'create']).as('exemplares.create')
+    router.post('/exemplares', [ExemplarController, 'store']).as('exemplares.store')
+    router
+      .get('/exemplares/:id/editar', [ExemplarController, 'edit'])
+      .where('id', /^[0-9]+$/)
+      .as('exemplares.edit')
+    router
+      .put('/exemplares/:id', [ExemplarController, 'update'])
+      .where('id', /^[0-9]+$/)
+      .as('exemplares.update')
+    router
+      .delete('/exemplares/:id', [ExemplarController, 'destroy'])
+      .where('id', /^[0-9]+$/)
+      .as('exemplares.destroy')
   })
   .use(middleware.auth())
