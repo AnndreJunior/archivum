@@ -1,0 +1,45 @@
+@layouts.app({ title: 'Novo empréstimo — Archivum', active: 'emprestimos' })
+  <div class="mx-auto max-w-3xl">
+    <h1 class="text-2xl font-bold text-gray-900">Novo empréstimo</h1>
+    <p class="mt-1 text-sm text-gray-600">
+      Selecione o aluno e o exemplar que ele está levando. O prazo é de 15 dias úteis.
+    </p>
+
+    @flashMessage('erro')
+      <div
+        class="mt-6 flex items-start gap-3 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+      >
+        @svg('lucide:circle-alert', { class: 'mt-0.5 h-4 w-4 shrink-0' })
+        <span>{{ $message }}</span>
+      </div>
+    @end
+
+    @if(alunos.length === 0)
+      <div
+        class="mt-6 flex items-start gap-3 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700"
+      >
+        @svg('lucide:triangle-alert', { class: 'mt-0.5 h-4 w-4 shrink-0' })
+        <span>Nenhum aluno ativo cadastrado. Cadastre ou reative um aluno para emprestar.</span>
+      </div>
+    @end
+
+    @if(exemplares.length === 0)
+      <div
+        class="mt-6 flex items-start gap-3 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700"
+      >
+        @svg('lucide:triangle-alert', { class: 'mt-0.5 h-4 w-4 shrink-0' })
+        <span>Nenhum exemplar disponível no acervo no momento.</span>
+      </div>
+    @end
+
+    <div class="mt-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+      @let(formCriar = formAttributes('emprestimos.store'))
+      @!emprestimos.form({
+        acao: formCriar.action,
+        metodo: formCriar.method,
+        alunos: alunos,
+        exemplares: exemplares,
+      })
+    </div>
+  </div>
+@end

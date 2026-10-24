@@ -1,8 +1,12 @@
 import Alpine from 'alpinejs'
 import { seletorAutores } from './seletor-autores.js'
+import { seletorAlunos } from './seletor-alunos.js'
+import { seletorExemplares } from './seletor-exemplares.js'
 import { seletorLivros } from './seletor-livros.js'
 
 Alpine.data('seletorAutores', seletorAutores)
+Alpine.data('seletorAlunos', seletorAlunos)
+Alpine.data('seletorExemplares', seletorExemplares)
 Alpine.data('seletorLivros', seletorLivros)
 
 Alpine.data('alert', function () {

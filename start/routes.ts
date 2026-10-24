@@ -16,6 +16,7 @@ const AlunoController = () => import('#controllers/aluno_controller')
 const LivroController = () => import('#controllers/livro_controller')
 const AutorController = () => import('#controllers/autor_controller')
 const ExemplarController = () => import('#controllers/exemplar_controller')
+const EmprestimoController = () => import('#controllers/emprestimo_controller')
 
 /**
  * Autenticação — rotas públicas (acessíveis sem sessão).
@@ -126,5 +127,24 @@ router
       .delete('/exemplares/:id', [ExemplarController, 'destroy'])
       .where('id', /^[0-9]+$/)
       .as('exemplares.destroy')
+  })
+  .use(middleware.auth())
+
+/**
+ * Empréstimos (exigem autenticação).
+ */
+router
+  .group(() => {
+    router.get('/emprestimos', [EmprestimoController, 'index']).as('emprestimos.index')
+    router.get('/emprestimos/criar', [EmprestimoController, 'create']).as('emprestimos.create')
+    router.post('/emprestimos', [EmprestimoController, 'store']).as('emprestimos.store')
+    router
+      .post('/emprestimos/:id/renovar', [EmprestimoController, 'renovar'])
+      .where('id', /^[0-9]+$/)
+      .as('emprestimos.renovar')
+    router
+      .post('/emprestimos/:id/devolver', [EmprestimoController, 'devolver'])
+      .where('id', /^[0-9]+$/)
+      .as('emprestimos.devolver')
   })
   .use(middleware.auth())

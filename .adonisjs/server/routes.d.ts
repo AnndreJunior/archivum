@@ -31,6 +31,11 @@ export type ScannedRoutes = {
     'exemplares.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'exemplares.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'exemplares.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'emprestimos.index': { paramsTuple?: []; params?: {} }
+    'emprestimos.create': { paramsTuple?: []; params?: {} }
+    'emprestimos.store': { paramsTuple?: []; params?: {} }
+    'emprestimos.renovar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'emprestimos.devolver': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   GET: {
     'auth.login': { paramsTuple?: []; params?: {} }
@@ -47,6 +52,8 @@ export type ScannedRoutes = {
     'exemplares.index': { paramsTuple?: []; params?: {} }
     'exemplares.create': { paramsTuple?: []; params?: {} }
     'exemplares.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'emprestimos.index': { paramsTuple?: []; params?: {} }
+    'emprestimos.create': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
     'auth.login': { paramsTuple?: []; params?: {} }
@@ -63,6 +70,8 @@ export type ScannedRoutes = {
     'exemplares.index': { paramsTuple?: []; params?: {} }
     'exemplares.create': { paramsTuple?: []; params?: {} }
     'exemplares.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'emprestimos.index': { paramsTuple?: []; params?: {} }
+    'emprestimos.create': { paramsTuple?: []; params?: {} }
   }
   POST: {
     'auth.login.attempt': { paramsTuple?: []; params?: {} }
@@ -73,6 +82,9 @@ export type ScannedRoutes = {
     'livros.store': { paramsTuple?: []; params?: {} }
     'autores.store': { paramsTuple?: []; params?: {} }
     'exemplares.store': { paramsTuple?: []; params?: {} }
+    'emprestimos.store': { paramsTuple?: []; params?: {} }
+    'emprestimos.renovar': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'emprestimos.devolver': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PUT: {
     'alunos.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
