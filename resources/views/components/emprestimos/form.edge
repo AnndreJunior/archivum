@@ -1,0 +1,341 @@
+{{--
+  Partial do formulário de novo empréstimo.
+
+  Props:
+  acao       - URL de submissão (formAttributes(...).action).
+  metodo     - Método HTML do formulário (formAttributes(...).method).
+  alunos     - Alunos ativos no formato { id, nome, matricula, nivel, anoEscolar, turma }.
+  exemplares - Exemplares disponíveis no formato { id, codigo, titulo, isbn, autores }.
+--}}
+@let(acao = $props.get('acao'))
+@let(metodo = $props.get('metodo'))
+@let(alunos = $props.get('alunos') ?? [])
+@let(exemplares = $props.get('exemplares') ?? [])
+@let(alunoSelecionadoInicial = old('alunoId', ''))
+@let(exemplarSelecionadoInicial = old('exemplarId', ''))
+
+<form action="{{ acao }}" method="{{ metodo ?? 'post' }}" class="space-y-6">
+  {{ csrfField() }}
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+    <div
+      x-data="seletorAlunos({
+        alunosIniciais: {{ JSON.stringify(alunos) }},
+        selecionadoInicial: {{ JSON.stringify(alunoSelecionadoInicial || null) }}
+        })"
+    >
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <span class="block text-sm font-medium text-gray-900">Aluno</span>
+          <span class="text-xs text-gray-500">Quem está levando o exemplar.</span>
+        </div>
+
+        <button
+          type="button"
+          @click="abrir()"
+          class="inline-flex items-center justify-center gap-2 rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+        >
+          @svg('lucide:user-round-search', { class: 'h-4 w-4' })
+          Selecionar aluno
+        </button>
+      </div>
+
+      <input
+        type="hidden"
+        name="alunoId"
+        value="{{ alunoSelecionadoInicial }}"
+        x-model="selecionado"
+      />
+
+      <div class="mt-3 min-h-20 rounded-md border border-gray-200 bg-gray-50 p-3">
+        <template x-if="alunoSelecionado">
+          <div class="flex flex-col gap-1">
+            <span class="text-sm font-medium text-gray-900" x-text="alunoSelecionado.nome"></span>
+            <span class="text-xs text-gray-500" x-text="alunoSelecionado.matricula"></span>
+            <span
+              class="text-xs text-gray-500"
+              x-text="`${alunoSelecionado.anoEscolar}º ano · Turma ${alunoSelecionado.turma}`"
+            ></span>
+          </div>
+        </template>
+        <span x-show="!alunoSelecionado" class="text-sm text-gray-500">
+          Nenhum aluno selecionado.
+        </span>
+      </div>
+      @inputError('alunoId')
+        @each(message in $messages)
+          <p class="mt-1 text-sm text-red-600">{{ message }}</p>
+        @end
+      @end
+
+      <div
+        x-show="aberto"
+        x-cloak
+        class="fixed inset-0 z-50 overflow-y-auto"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="titulo-modal-alunos"
+        @keydown.escape.window="fechar()"
+      >
+        <div class="fixed inset-0 bg-gray-900/50" @click="fechar()"></div>
+
+        <div class="relative mx-auto mt-16 w-full max-w-lg px-4">
+          <div class="rounded-xl border border-gray-200 bg-white shadow-xl">
+            <div class="flex items-center justify-between border-b border-gray-200 px-6 py-4">
+              <h2 id="titulo-modal-alunos" class="text-lg font-semibold text-gray-900">
+                Selecionar aluno
+              </h2>
+
+              <button
+                type="button"
+                @click="fechar()"
+                class="cursor-pointer rounded-md p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                aria-label="Fechar"
+              >
+                @svg('lucide:x', { class: 'h-5 w-5' })
+              </button>
+            </div>
+
+            <div class="px-6 py-5">
+              <label for="busca-alunos" class="block text-sm font-medium text-gray-900">
+                Pesquisar aluno
+              </label>
+              <input
+                type="text"
+                id="busca-alunos"
+                x-model="busca"
+                x-ref="busca"
+                placeholder="Digite o nome ou a matrícula"
+                class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/30"
+              />
+
+              <div class="mt-3 max-h-72 overflow-y-auto rounded-md border border-gray-200">
+                <template x-for="aluno in alunosFiltrados" :key="aluno.id">
+                  <label
+                    class="flex cursor-pointer items-start gap-3 border-b border-gray-100 px-3 py-2.5 text-sm text-gray-800 last:border-b-0 hover:bg-gray-50"
+                  >
+                    <input
+                      type="radio"
+                      name="aluno-modal"
+                      class="mt-0.5 h-4 w-4 border-gray-300 text-brand focus:ring-brand/30"
+                      :checked="selecionado === aluno.id"
+                      @change="selecionar(aluno.id)"
+                    />
+                    <span class="flex flex-col gap-0.5">
+                      <span class="font-medium" x-text="aluno.nome"></span>
+                      <span class="text-xs text-gray-500" x-text="aluno.matricula"></span>
+                      <span
+                        class="text-xs text-gray-500"
+                        x-text="`${aluno.anoEscolar}º ano · Turma ${aluno.turma}`"
+                      ></span>
+                    </span>
+                  </label>
+                </template>
+
+                <p
+                  x-show="alunosFiltrados.length === 0"
+                  class="px-3 py-8 text-center text-sm text-gray-500"
+                >
+                  Nenhum aluno encontrado.
+                </p>
+              </div>
+
+              <div
+                class="mt-5 flex flex-col-reverse gap-3 border-t border-gray-200 pt-4 sm:flex-row sm:items-center sm:justify-end"
+              >
+                <button
+                  type="button"
+                  @click="fechar()"
+                  class="inline-flex items-center justify-center gap-2 rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  @click="fechar()"
+                  class="inline-flex items-center justify-center gap-2 rounded-md bg-brand px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand/90"
+                >
+                  @svg('lucide:check', { class: 'h-4 w-4' })
+                  Concluir
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      x-data="seletorExemplares({
+        exemplaresIniciais: {{ JSON.stringify(exemplares) }},
+        selecionadoInicial: {{ JSON.stringify(exemplarSelecionadoInicial || null) }}
+        })"
+    >
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <span class="block text-sm font-medium text-gray-900">Exemplar</span>
+          <span class="text-xs text-gray-500">Cópia física que será retirada.</span>
+        </div>
+
+        <button
+          type="button"
+          @click="abrir()"
+          class="inline-flex items-center justify-center gap-2 rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+        >
+          @svg('lucide:book-search', { class: 'h-4 w-4' })
+          Selecionar exemplar
+        </button>
+      </div>
+
+      <input
+        type="hidden"
+        name="exemplarId"
+        value="{{ exemplarSelecionadoInicial }}"
+        x-model="selecionado"
+      />
+
+      <div class="mt-3 min-h-20 rounded-md border border-gray-200 bg-gray-50 p-3">
+        <template x-if="exemplarSelecionado">
+          <div class="flex flex-col gap-1">
+            <span
+              class="text-sm font-medium text-gray-900"
+              x-text="exemplarSelecionado.codigo"
+            ></span>
+            <span class="text-xs text-gray-500" x-text="exemplarSelecionado.titulo"></span>
+            <span
+              class="text-xs text-gray-500"
+              x-text="
+                exemplarSelecionado.autores.length > 0
+                ? exemplarSelecionado.autores.join(', ')
+                : 'Sem autores'
+                "
+            ></span>
+          </div>
+        </template>
+        <span x-show="!exemplarSelecionado" class="text-sm text-gray-500">
+          Nenhum exemplar selecionado.
+        </span>
+      </div>
+      @inputError('exemplarId')
+        @each(message in $messages)
+          <p class="mt-1 text-sm text-red-600">{{ message }}</p>
+        @end
+      @end
+
+      <div
+        x-show="aberto"
+        x-cloak
+        class="fixed inset-0 z-50 overflow-y-auto"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="titulo-modal-exemplares"
+        @keydown.escape.window="fechar()"
+      >
+        <div class="fixed inset-0 bg-gray-900/50" @click="fechar()"></div>
+
+        <div class="relative mx-auto mt-16 w-full max-w-lg px-4">
+          <div class="rounded-xl border border-gray-200 bg-white shadow-xl">
+            <div class="flex items-center justify-between border-b border-gray-200 px-6 py-4">
+              <h2 id="titulo-modal-exemplares" class="text-lg font-semibold text-gray-900">
+                Selecionar exemplar
+              </h2>
+
+              <button
+                type="button"
+                @click="fechar()"
+                class="cursor-pointer rounded-md p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                aria-label="Fechar"
+              >
+                @svg('lucide:x', { class: 'h-5 w-5' })
+              </button>
+            </div>
+
+            <div class="px-6 py-5">
+              <label for="busca-exemplares" class="block text-sm font-medium text-gray-900">
+                Pesquisar exemplar
+              </label>
+              <input
+                type="text"
+                id="busca-exemplares"
+                x-model="busca"
+                x-ref="busca"
+                placeholder="Digite o código, título ou autor"
+                class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/30"
+              />
+
+              <div class="mt-3 max-h-72 overflow-y-auto rounded-md border border-gray-200">
+                <template x-for="exemplar in exemplaresFiltrados" :key="exemplar.id">
+                  <label
+                    class="flex cursor-pointer items-start gap-3 border-b border-gray-100 px-3 py-2.5 text-sm text-gray-800 last:border-b-0 hover:bg-gray-50"
+                  >
+                    <input
+                      type="radio"
+                      name="exemplar-modal"
+                      class="mt-0.5 h-4 w-4 border-gray-300 text-brand focus:ring-brand/30"
+                      :checked="selecionado === exemplar.id"
+                      @change="selecionar(exemplar.id)"
+                    />
+                    <span class="flex flex-col gap-0.5">
+                      <span class="font-medium" x-text="exemplar.codigo"></span>
+                      <span class="text-xs text-gray-500" x-text="exemplar.titulo"></span>
+                      <span
+                        class="text-xs text-gray-500"
+                        x-text="
+                          exemplar.autores.length > 0
+                          ? exemplar.autores.join(', ')
+                          : 'Sem autores'
+                          "
+                      ></span>
+                    </span>
+                  </label>
+                </template>
+
+                <p
+                  x-show="exemplaresFiltrados.length === 0"
+                  class="px-3 py-8 text-center text-sm text-gray-500"
+                >
+                  Nenhum exemplar encontrado.
+                </p>
+              </div>
+
+              <div
+                class="mt-5 flex flex-col-reverse gap-3 border-t border-gray-200 pt-4 sm:flex-row sm:items-center sm:justify-end"
+              >
+                <button
+                  type="button"
+                  @click="fechar()"
+                  class="inline-flex items-center justify-center gap-2 rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  @click="fechar()"
+                  class="inline-flex items-center justify-center gap-2 rounded-md bg-brand px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand/90"
+                >
+                  @svg('lucide:check', { class: 'h-4 w-4' })
+                  Concluir
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-3 border-t border-gray-200 pt-5">
+    <button
+      type="submit"
+      class="inline-flex items-center gap-2 rounded-md bg-brand px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand/90"
+    >
+      @svg('lucide:hand-coins', { class: 'h-4 w-4' })
+      Registrar empréstimo
+    </button>
+    <a
+      href="{{ route('emprestimos.index') }}"
+      class="text-sm font-medium text-gray-600 hover:text-gray-900"
+    >
+      Cancelar
+    </a>
+  </div>
+</form>

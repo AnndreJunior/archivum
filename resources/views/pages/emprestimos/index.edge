@@ -1,0 +1,199 @@
+@layouts.app({ title: 'Empréstimos — Archivum', active: 'emprestimos' })
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Empréstimos</h1>
+      <p class="mt-1 text-sm text-gray-600">
+        Acompanhe as retiradas, renovações e devoluções registradas no balcão.
+      </p>
+    </div>
+
+    <a
+      href="{{ route('emprestimos.create') }}"
+      class="inline-flex items-center gap-2 rounded-md bg-brand px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand/90"
+    >
+      @svg('lucide:hand-coins', { class: 'h-4 w-4' })
+      Novo empréstimo
+    </a>
+  </div>
+
+  @flashMessage('sucesso')
+    <div
+      class="mt-6 flex items-start gap-3 rounded-md border border-green-200 bg-green-50 p-3 text-sm text-green-700"
+    >
+      @svg('lucide:circle-check', { class: 'mt-0.5 h-4 w-4 shrink-0' })
+      <span>{{ $message }}</span>
+    </div>
+  @end
+
+  @flashMessage('erro')
+    <div
+      class="mt-6 flex items-start gap-3 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+    >
+      @svg('lucide:circle-alert', { class: 'mt-0.5 h-4 w-4 shrink-0' })
+      <span>{{ $message }}</span>
+    </div>
+  @end
+
+  <form
+    action="{{ route('emprestimos.index') }}"
+    method="get"
+    class="mt-6 flex flex-col gap-2 sm:flex-row sm:items-center"
+  >
+    <input
+      type="search"
+      name="busca"
+      value="{{ busca }}"
+      placeholder="Buscar por aluno, matrícula, código do exemplar ou título"
+      class="block w-full max-w-md rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/30"
+    />
+
+    <select
+      name="status"
+      class="block rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/30"
+    >
+      <option value="" {{ status === '' ? 'selected' : '' }}>Todos</option>
+      <option value="ativo" {{ status === 'ativo' ? 'selected' : '' }}>Ativos</option>
+      <option value="devolvido" {{ status === 'devolvido' ? 'selected' : '' }}>Devolvidos</option>
+      <option value="vencido" {{ status === 'vencido' ? 'selected' : '' }}>Vencidos</option>
+    </select>
+
+    <button
+      type="submit"
+      class="inline-flex items-center gap-2 rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+    >
+      @svg('lucide:search', { class: 'h-4 w-4' })
+      Buscar
+    </button>
+  </form>
+
+  <div class="mt-6 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+    <table class="min-w-full divide-y divide-gray-200 text-sm">
+      <thead class="bg-gray-50 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+        <tr>
+          <th class="px-4 py-3">Aluno</th>
+          <th class="px-4 py-3">Exemplar</th>
+          <th class="px-4 py-3">Retirada / prazo</th>
+          <th class="px-4 py-3">Renovações</th>
+          <th class="px-4 py-3">Status</th>
+          <th class="px-4 py-3 text-right">Ações</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        @each(emprestimo in emprestimos)
+          @let(vencido = emprestimo.status === 'ativo' && emprestimo.dataPrevistaDevolucao.toISODate() < hojeIso)
+          @let(rotuloStatus = emprestimo.status === 'devolvido' ? 'Devolvido' : (vencido ? 'Vencido' : 'Ativo'))
+          @let(classeStatus = emprestimo.status === 'devolvido' ? 'bg-gray-100 text-gray-600' : (vencido ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'))
+
+          <tr>
+            <td class="px-4 py-3">
+              <div class="font-medium text-gray-900">{{ emprestimo.aluno.nome }}</div>
+              <div class="text-xs text-gray-500">{{ emprestimo.aluno.matricula }}</div>
+            </td>
+            <td class="px-4 py-3">
+              <div class="font-medium text-gray-900">{{ emprestimo.exemplar.codigo }}</div>
+              <div class="text-xs text-gray-500">{{ emprestimo.exemplar.livro.titulo }}</div>
+            </td>
+            <td class="px-4 py-3 text-gray-700">
+              {{--
+                A data de retirada é armazenada um dia à frente para a contagem
+                dos 15 dias úteis. Na exibição, mostramos o dia real da retirada.
+              --}}
+              <div>{{ emprestimo.dataRetirada.minus({ days: 1 }).toFormat('dd/MM/yyyy') }}</div>
+              @if(emprestimo.dataDevolucao)
+                <div class="text-xs text-gray-500">
+                  Devolvido em {{ emprestimo.dataDevolucao.toFormat('dd/MM/yyyy') }}
+                </div>
+              @else
+                <div class="text-xs text-gray-500">
+                  Prevista: {{ emprestimo.dataPrevistaDevolucao.toFormat('dd/MM/yyyy') }}
+                </div>
+              @end
+            </td>
+            <td class="px-4 py-3 text-gray-700">{{ emprestimo.renovacoes }}</td>
+            <td class="px-4 py-3">
+              <span
+                class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium {{ classeStatus }}"
+              >
+                {{ rotuloStatus }}
+              </span>
+            </td>
+            <td class="px-4 py-3">
+              @if(emprestimo.status === 'ativo')
+                <div class="flex items-center justify-end gap-3">
+                  @if(!vencido)
+                    <form
+                      action="{{ route('emprestimos.renovar', { id: emprestimo.id }) }}"
+                      method="post"
+                    >
+                      {{ csrfField() }}
+                      <button
+                        type="submit"
+                        class="inline-flex cursor-pointer items-center gap-1 font-medium text-brand hover:underline"
+                      >
+                        @svg('lucide:refresh-cw', { class: 'h-4 w-4' })
+                        Renovar
+                      </button>
+                    </form>
+                  @end
+
+                  <form
+                    action="{{ route('emprestimos.devolver', { id: emprestimo.id }) }}"
+                    method="post"
+                    onsubmit="return confirm('Registrar a devolução de {{ emprestimo.exemplar.codigo }}?')"
+                  >
+                    {{ csrfField() }}
+                    <button
+                      type="submit"
+                      class="inline-flex cursor-pointer items-center gap-1 font-medium text-red-600 hover:text-red-700"
+                    >
+                      @svg('lucide:undo-2', { class: 'h-4 w-4' })
+                      Devolver
+                    </button>
+                  </form>
+                </div>
+              @else
+                <div class="text-right text-xs text-gray-500">
+                  @if(emprestimo.bibliotecarioDevolucao)
+                    Recebido por {{ emprestimo.bibliotecarioDevolucao.nome }}
+                  @else
+                    —
+                  @end
+                </div>
+              @end
+            </td>
+          </tr>
+        @else
+          <tr>
+            <td colspan="6" class="px-4 py-10 text-center text-gray-500">
+              Nenhum empréstimo encontrado.
+            </td>
+          </tr>
+        @end
+      </tbody>
+    </table>
+  </div>
+
+  @if(emprestimos.hasPages)
+    <div class="mt-4 flex items-center justify-between text-sm text-gray-600">
+      <span>Página {{ emprestimos.currentPage }} de {{ emprestimos.lastPage }}</span>
+      <div class="flex items-center gap-2">
+        @if(emprestimos.currentPage > 1)
+          <a
+            href="{{ emprestimos.getUrl(emprestimos.currentPage - 1) }}"
+            class="rounded-md border border-gray-300 px-3 py-1.5 font-medium transition-colors hover:bg-gray-50"
+          >
+            Anterior
+          </a>
+        @end
+        @if(emprestimos.currentPage < emprestimos.lastPage)
+          <a
+            href="{{ emprestimos.getUrl(emprestimos.currentPage + 1) }}"
+            class="rounded-md border border-gray-300 px-3 py-1.5 font-medium transition-colors hover:bg-gray-50"
+          >
+            Próxima
+          </a>
+        @end
+      </div>
+    </div>
+  @end
+@end
