@@ -71,7 +71,7 @@ tests/helpers/        database.ts (banco por grupo), mail.ts (smtp4dev por suít
 
 No startup do servidor HTTP, o preload `start/admin.ts` (registrado em `adonisrc.ts`
 apenas no ambiente `web`) garante que exista um bibliotecário com `role = 'admin'`. Se
-não houver nenhum, ele é criado por `app/services/admin_bibliotecario.ts` usando as
+não houver nenhum, ele é criado por `app/services/admin_bibliotecario_service.ts` usando as
 variáveis de ambiente `ADMIN_NOME`, `ADMIN_MATRICULA`, `ADMIN_EMAIL` e `ADMIN_SENHA`
 (secreta, com hash aplicado pelo `withAuthFinder`). Como roda só no ambiente `web`, não
 interfere nos testes nem em comandos do Ace, e executa depois das migrations.
