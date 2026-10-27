@@ -79,8 +79,26 @@
         class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/30"
       >
         <option value="">Selecione</option>
-        <option value="bibliotecario" {{ old('role', bibliotecario ? bibliotecario.role : '') === 'bibliotecario' ? 'selected' : '' }}>Bibliotecário</option>
-        <option value="admin" {{ old('role', bibliotecario ? bibliotecario.role : '') === 'admin' ? 'selected' : '' }}>Administrador</option>
+        <option
+          value="bibliotecario"
+          {{
+            old('role', bibliotecario ? bibliotecario.role : '') === 'bibliotecario'
+              ? 'selected'
+              : ''
+          }}
+        >
+          Bibliotecário
+        </option>
+        <option
+          value="admin"
+          {{
+            old('role', bibliotecario ? bibliotecario.role : '') === 'admin'
+              ? 'selected'
+              : ''
+          }}
+        >
+          Administrador
+        </option>
       </select>
       <p class="mt-1 text-xs text-gray-500">
         Administradores gerenciam os usuários e também podem desativar alunos.
