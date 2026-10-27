@@ -41,6 +41,18 @@
               ></span>
             </a>
           @end
+          @if(auth.user && auth.user.isAdmin)
+            <a
+              href="{{ route('bibliotecarios.index') }}"
+              {{{ active === 'bibliotecarios' ? 'aria-current="page"' : '' }}}
+              class="group relative py-1 text-sm font-medium text-gray-200 transition-colors hover:text-white"
+            >
+              Bibliotecários
+              <span
+                class="absolute inset-x-0 -bottom-0.5 h-0.5 origin-left scale-x-0 rounded-full bg-gray-200 transition-transform duration-300 ease-out group-hover:scale-x-100 {{ active === 'bibliotecarios' ? 'scale-x-100' : '' }}"
+              ></span>
+            </a>
+          @end
         </nav>
         {{-- O csrfField só existe quando o Shield roda (rotas registradas); em páginas de erro (404) ele não é compartilhado. --}}
         @if(csrfField)

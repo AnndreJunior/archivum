@@ -17,6 +17,7 @@ const LivroController = () => import('#controllers/livro_controller')
 const AutorController = () => import('#controllers/autor_controller')
 const ExemplarController = () => import('#controllers/exemplar_controller')
 const EmprestimoController = () => import('#controllers/emprestimo_controller')
+const BibliotecarioController = () => import('#controllers/bibliotecario_controller')
 
 /**
  * Autenticação — rotas públicas (acessíveis sem sessão).
@@ -84,6 +85,32 @@ router
       .as('alunos.ativo')
   })
   .use(middleware.auth())
+
+/**
+ * Bibliotecários (exigem autenticação e perfil de administrador).
+ */
+router
+  .group(() => {
+    router.get('/bibliotecarios', [BibliotecarioController, 'index']).as('bibliotecarios.index')
+    router
+      .get('/bibliotecarios/criar', [BibliotecarioController, 'create'])
+      .as('bibliotecarios.create')
+    router.post('/bibliotecarios', [BibliotecarioController, 'store']).as('bibliotecarios.store')
+    router
+      .get('/bibliotecarios/:id/editar', [BibliotecarioController, 'edit'])
+      .where('id', /^[0-9]+$/)
+      .as('bibliotecarios.edit')
+    router
+      .put('/bibliotecarios/:id', [BibliotecarioController, 'update'])
+      .where('id', /^[0-9]+$/)
+      .as('bibliotecarios.update')
+    router
+      .patch('/bibliotecarios/:id/ativo', [BibliotecarioController, 'alternarAtivo'])
+      .where('id', /^[0-9]+$/)
+      .as('bibliotecarios.ativo')
+  })
+  .use(middleware.auth())
+  .use(middleware.admin())
 
 /**
  * Livros (exigem autenticação).

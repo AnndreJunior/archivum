@@ -18,6 +18,12 @@ export type ScannedRoutes = {
     'alunos.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'alunos.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'alunos.ativo': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'bibliotecarios.index': { paramsTuple?: []; params?: {} }
+    'bibliotecarios.create': { paramsTuple?: []; params?: {} }
+    'bibliotecarios.store': { paramsTuple?: []; params?: {} }
+    'bibliotecarios.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'bibliotecarios.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'bibliotecarios.ativo': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'livros.index': { paramsTuple?: []; params?: {} }
     'livros.create': { paramsTuple?: []; params?: {} }
     'livros.store': { paramsTuple?: []; params?: {} }
@@ -45,6 +51,9 @@ export type ScannedRoutes = {
     'alunos.index': { paramsTuple?: []; params?: {} }
     'alunos.create': { paramsTuple?: []; params?: {} }
     'alunos.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'bibliotecarios.index': { paramsTuple?: []; params?: {} }
+    'bibliotecarios.create': { paramsTuple?: []; params?: {} }
+    'bibliotecarios.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'livros.index': { paramsTuple?: []; params?: {} }
     'livros.create': { paramsTuple?: []; params?: {} }
     'livros.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -63,6 +72,9 @@ export type ScannedRoutes = {
     'alunos.index': { paramsTuple?: []; params?: {} }
     'alunos.create': { paramsTuple?: []; params?: {} }
     'alunos.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'bibliotecarios.index': { paramsTuple?: []; params?: {} }
+    'bibliotecarios.create': { paramsTuple?: []; params?: {} }
+    'bibliotecarios.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'livros.index': { paramsTuple?: []; params?: {} }
     'livros.create': { paramsTuple?: []; params?: {} }
     'livros.edit': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -79,6 +91,7 @@ export type ScannedRoutes = {
     'auth.trocar_senha.atualizar': { paramsTuple?: []; params?: {} }
     'auth.logout': { paramsTuple?: []; params?: {} }
     'alunos.store': { paramsTuple?: []; params?: {} }
+    'bibliotecarios.store': { paramsTuple?: []; params?: {} }
     'livros.store': { paramsTuple?: []; params?: {} }
     'autores.store': { paramsTuple?: []; params?: {} }
     'exemplares.store': { paramsTuple?: []; params?: {} }
@@ -88,11 +101,13 @@ export type ScannedRoutes = {
   }
   PUT: {
     'alunos.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'bibliotecarios.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'livros.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'exemplares.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PATCH: {
     'alunos.ativo': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'bibliotecarios.ativo': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   DELETE: {
     'exemplares.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
