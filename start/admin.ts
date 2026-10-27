@@ -1,6 +1,6 @@
 import env from '#start/env'
 import logger from '@adonisjs/core/services/logger'
-import { garantirAdminBibliotecario } from '#services/admin_bibliotecario'
+import { garantirAdminBibliotecario } from '#services/admin_bibliotecario_service'
 
 /**
  * Garante que o bibliotecário admin definido nas variáveis de ambiente

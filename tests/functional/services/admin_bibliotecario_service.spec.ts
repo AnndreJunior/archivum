@@ -1,7 +1,7 @@
 import { test } from '@japa/runner'
 import Bibliotecario from '#models/bibliotecario'
 import { useDatabase } from '#tests/helpers/database'
-import { garantirAdminBibliotecario } from '#services/admin_bibliotecario'
+import { garantirAdminBibliotecario } from '#services/admin_bibliotecario_service'
 
 /**
  * Credenciais usadas nos testes. Em produção elas vêm das variáveis de
