@@ -7,6 +7,7 @@ export const controllers = {
   Aluno: () => import('#controllers/aluno_controller'),
   Auth: () => import('#controllers/auth_controller'),
   Autor: () => import('#controllers/autor_controller'),
+  Bibliotecario: () => import('#controllers/bibliotecario_controller'),
   Emprestimo: () => import('#controllers/emprestimo_controller'),
   Exemplar: () => import('#controllers/exemplar_controller'),
   Livro: () => import('#controllers/livro_controller'),
