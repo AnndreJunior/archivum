@@ -29,6 +29,7 @@ const dbConfig = defineConfig({
       migrations: {
         naturalSort: true,
         paths: ['database/migrations'],
+        disableRollbacksInProduction: app.inProduction,
       },
       schemaGeneration: {
         rulesPaths: ['#database/schema_rules'],
