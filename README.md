@@ -4,6 +4,19 @@ Sistema interno de gestão de uma biblioteca escolar. Bibliotecários cadastram 
 livros, autores e exemplares, e registram empréstimos no balcão. Alunos **não** acessam o
 sistema — são apenas registros, sem login, conta ou reserva.
 
+## Demo em produção
+
+A versão de demonstração está disponível em <https://archivum-jv4q.onrender.com>.
+
+Credenciais de acesso (ambiente de demonstração, apenas para testes):
+
+| Campo  | Valor                  |
+| ------ | ---------------------- |
+| E-mail | `admin@archivum.local` |
+| Senha  | `adminarchivum123`     |
+
+> Os dados são apenas de demonstração e podem ser reiniciados a qualquer momento.
+
 ## Tecnologias
 
 - **[AdonisJS v7](https://adonisjs.com/)** — monolito MVC em TypeScript (ESM).
