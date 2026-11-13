@@ -27,45 +27,47 @@
     <header class="bg-brand text-white">
       <div class="mx-auto flex max-w-6xl items-center justify-between gap-6 px-6 py-4">
         <a href="{{ route('home') }}" class="text-xl font-bold tracking-tight">Archivum</a>
-
-        <nav class="flex items-center gap-6">
-          @each(item in navItems)
-            <a
-              href="{{ item.href }}"
-              {{{ active === item.key ? 'aria-current="page"' : '' }}}
-              class="group relative py-1 text-sm font-medium text-gray-200 transition-colors hover:text-white"
-            >
-              {{ item.label }}
-              <span
-                class="absolute inset-x-0 -bottom-0.5 h-0.5 origin-left scale-x-0 rounded-full bg-gray-200 transition-transform duration-300 ease-out group-hover:scale-x-100 {{ active === item.key ? 'scale-x-100' : '' }}"
-              ></span>
-            </a>
+        {{-- A navegação só faz sentido com um usuário autenticado; em páginas de erro (404/500) o auth não é compartilhado. --}}
+        @if(auth?.user)
+          <nav class="flex items-center gap-6">
+            @each(item in navItems)
+              <a
+                href="{{ item.href }}"
+                {{{ active === item.key ? 'aria-current="page"' : '' }}}
+                class="group relative py-1 text-sm font-medium text-gray-200 transition-colors hover:text-white"
+              >
+                {{ item.label }}
+                <span
+                  class="absolute inset-x-0 -bottom-0.5 h-0.5 origin-left scale-x-0 rounded-full bg-gray-200 transition-transform duration-300 ease-out group-hover:scale-x-100 {{ active === item.key ? 'scale-x-100' : '' }}"
+                ></span>
+              </a>
+            @end
+            @if(auth.user.isAdmin)
+              <a
+                href="{{ route('bibliotecarios.index') }}"
+                {{{ active === 'bibliotecarios' ? 'aria-current="page"' : '' }}}
+                class="group relative py-1 text-sm font-medium text-gray-200 transition-colors hover:text-white"
+              >
+                Bibliotecários
+                <span
+                  class="absolute inset-x-0 -bottom-0.5 h-0.5 origin-left scale-x-0 rounded-full bg-gray-200 transition-transform duration-300 ease-out group-hover:scale-x-100 {{ active === 'bibliotecarios' ? 'scale-x-100' : '' }}"
+                ></span>
+              </a>
+            @end
+          </nav>
+          {{-- O csrfField só existe quando o Shield roda (rotas registradas); em páginas de erro (404) ele não é compartilhado. --}}
+          @if(csrfField)
+            <form action="{{ route('auth.logout') }}" method="post">
+              {{ csrfField() }}
+              <button
+                type="submit"
+                class="inline-flex items-center gap-2 rounded-md border border-white/30 px-3 py-1.5 text-sm font-medium text-gray-200 transition-colors hover:border-white hover:text-white"
+              >
+                @svg('lucide:log-out', { class: 'h-4 w-4' })
+                Sair
+              </button>
+            </form>
           @end
-          @if(auth.user && auth.user.isAdmin)
-            <a
-              href="{{ route('bibliotecarios.index') }}"
-              {{{ active === 'bibliotecarios' ? 'aria-current="page"' : '' }}}
-              class="group relative py-1 text-sm font-medium text-gray-200 transition-colors hover:text-white"
-            >
-              Bibliotecários
-              <span
-                class="absolute inset-x-0 -bottom-0.5 h-0.5 origin-left scale-x-0 rounded-full bg-gray-200 transition-transform duration-300 ease-out group-hover:scale-x-100 {{ active === 'bibliotecarios' ? 'scale-x-100' : '' }}"
-              ></span>
-            </a>
-          @end
-        </nav>
-        {{-- O csrfField só existe quando o Shield roda (rotas registradas); em páginas de erro (404) ele não é compartilhado. --}}
-        @if(csrfField)
-          <form action="{{ route('auth.logout') }}" method="post">
-            {{ csrfField() }}
-            <button
-              type="submit"
-              class="inline-flex items-center gap-2 rounded-md border border-white/30 px-3 py-1.5 text-sm font-medium text-gray-200 transition-colors hover:border-white hover:text-white"
-            >
-              @svg('lucide:log-out', { class: 'h-4 w-4' })
-              Sair
-            </button>
-          </form>
         @end
       </div>
     </header>
