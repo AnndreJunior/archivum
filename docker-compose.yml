@@ -56,6 +56,7 @@ services:
       DB_USER: ${DB_USER:-archivum}
       DB_PASSWORD: ${DB_PASSWORD:-archivum}
       DB_DATABASE: ${DB_DATABASE:-archivum}
+      DB_USE_SSL: ${DB_USE_SSL:-false}
     ports:
       - '${APP_PORT:-3333}:3333'
     command: sh -c "node ace migration:run --force && node bin/server.js"
