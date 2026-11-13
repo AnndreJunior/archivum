@@ -477,9 +477,28 @@ test.group('EmprestimoController | cadastro', (group) => {
 
     response.assertStatus(302)
 
-    const erros = response.flashMessage('inputErrorsBag')
-    assert.property(erros, 'alunoId')
-    assert.property(erros, 'exemplarId')
+    const erros = response.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(erros.alunoId, 'Aluno é obrigatório.')
+    assert.include(erros.exemplarId, 'Exemplar é obrigatório.')
+    assert.lengthOf(await Emprestimo.all(), 0)
+  })
+
+  test('rejeita seleção vazia de aluno ou exemplar', async ({ assert, client }) => {
+    const bibliotecario = await criarBibliotecario()
+
+    const response = await client
+      .post('/emprestimos')
+      .withCsrfToken()
+      .redirects(0)
+      .header('referer', '/emprestimos/criar')
+      .loginAs(bibliotecario)
+      .form({ alunoId: 0, exemplarId: 0 })
+
+    response.assertStatus(302)
+
+    const erros = response.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(erros.alunoId, 'Selecione um aluno.')
+    assert.include(erros.exemplarId, 'Selecione um exemplar.')
     assert.lengthOf(await Emprestimo.all(), 0)
   })
 
@@ -496,9 +515,9 @@ test.group('EmprestimoController | cadastro', (group) => {
 
     response.assertStatus(302)
 
-    const erros = response.flashMessage('inputErrorsBag')
-    assert.property(erros, 'alunoId')
-    assert.property(erros, 'exemplarId')
+    const erros = response.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(erros.alunoId, 'O aluno selecionado não existe.')
+    assert.include(erros.exemplarId, 'O exemplar selecionado não existe.')
     assert.lengthOf(await Emprestimo.all(), 0)
   })
 

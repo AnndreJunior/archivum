@@ -268,7 +268,36 @@ test.group('LivroController | cadastro', (group) => {
       .form({ ...dadosLivro, titulo: '' })
 
     response.assertStatus(302)
-    assert.property(response.flashMessage('inputErrorsBag'), 'titulo')
+
+    const erros = response.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(erros.titulo, 'Título é obrigatório.')
+    assert.lengthOf(await Livro.all(), 0)
+  })
+
+  test('rejeita ano de publicação fora da faixa', async ({ assert, client }) => {
+    const bibliotecario = await criarBibliotecario()
+
+    const abaixoDoMinimo = await client
+      .post('/livros')
+      .withCsrfToken()
+      .redirects(0)
+      .header('referer', '/livros/criar')
+      .loginAs(bibliotecario)
+      .form({ ...dadosLivro, anoPublicacao: 0 })
+
+    const errosAbaixo = abaixoDoMinimo.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(errosAbaixo.anoPublicacao, 'Ano de publicação deve ser no mínimo 1.')
+
+    const acimaDoMaximo = await client
+      .post('/livros')
+      .withCsrfToken()
+      .redirects(0)
+      .header('referer', '/livros/criar')
+      .loginAs(bibliotecario)
+      .form({ ...dadosLivro, anoPublicacao: 10000 })
+
+    const errosAcima = acimaDoMaximo.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(errosAcima.anoPublicacao, 'Ano de publicação deve ser no máximo 9999.')
     assert.lengthOf(await Livro.all(), 0)
   })
 
@@ -285,7 +314,9 @@ test.group('LivroController | cadastro', (group) => {
       .form(dadosLivro)
 
     response.assertStatus(302)
-    assert.property(response.flashMessage('inputErrorsBag'), 'isbn')
+
+    const erros = response.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(erros.isbn, 'Este ISBN já está cadastrado.')
     assert.lengthOf(await Livro.all(), 1)
   })
 
@@ -302,7 +333,9 @@ test.group('LivroController | cadastro', (group) => {
       .form({ ...dadosLivro, isbn: '9788535902775' })
 
     response.assertStatus(302)
-    assert.property(response.flashMessage('inputErrorsBag'), 'isbn')
+
+    const erros = response.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(erros.isbn, 'Este ISBN já está cadastrado.')
     assert.lengthOf(await Livro.all(), 1)
   })
 
@@ -320,7 +353,9 @@ test.group('LivroController | cadastro', (group) => {
     response.assertStatus(302)
 
     const erros = response.flashMessage('inputErrorsBag') as Record<string, string[]>
-    assert.isTrue(Object.keys(erros).some((campo) => campo.startsWith('autores')))
+    const campoAutor = Object.keys(erros).find((campo) => campo.startsWith('autores'))
+    assert.isDefined(campoAutor)
+    assert.include(erros[campoAutor!], 'Um dos autores selecionados não existe.')
     assert.lengthOf(await Livro.all(), 0)
   })
 })

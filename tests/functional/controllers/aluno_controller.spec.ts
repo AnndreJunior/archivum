@@ -183,8 +183,78 @@ test.group('AlunoController | cadastro', (group) => {
       .form({})
 
     response.assertStatus(302)
-    assert.property(response.flashMessage('inputErrorsBag'), 'nome')
-    assert.property(response.flashMessage('inputErrorsBag'), 'matricula')
+
+    const erros = response.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(erros.nome, 'Nome é obrigatório.')
+    assert.include(erros.matricula, 'Matrícula é obrigatório.')
+    assert.lengthOf(await Aluno.all(), 0)
+  })
+
+  test('rejeita campos obrigatórios enviados em branco', async ({ assert, client }) => {
+    const bibliotecario = await criarBibliotecario()
+
+    const response = await client
+      .post('/alunos')
+      .withCsrfToken()
+      .redirects(0)
+      .header('referer', '/alunos/criar')
+      .loginAs(bibliotecario)
+      .form({ ...dadosAluno, nome: '   ', matricula: '   ', turma: '   ' })
+
+    response.assertStatus(302)
+
+    const erros = response.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(erros.nome, 'Nome é obrigatório.')
+    assert.include(erros.matricula, 'Matrícula é obrigatório.')
+    assert.include(erros.turma, 'Turma é obrigatório.')
+    assert.lengthOf(await Aluno.all(), 0)
+  })
+
+  test('rejeita nome maior que 120 caracteres', async ({ assert, client }) => {
+    const bibliotecario = await criarBibliotecario()
+
+    const response = await client
+      .post('/alunos')
+      .withCsrfToken()
+      .redirects(0)
+      .header('referer', '/alunos/criar')
+      .loginAs(bibliotecario)
+      .form({ ...dadosAluno, nome: 'a'.repeat(121) })
+
+    response.assertStatus(302)
+
+    const erros = response.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(erros.nome, 'Nome deve ter no máximo 120 caracteres.')
+    assert.lengthOf(await Aluno.all(), 0)
+  })
+
+  test('rejeita ano escolar fora da faixa com mensagens em português', async ({
+    assert,
+    client,
+  }) => {
+    const bibliotecario = await criarBibliotecario()
+
+    const abaixoDoMinimo = await client
+      .post('/alunos')
+      .withCsrfToken()
+      .redirects(0)
+      .header('referer', '/alunos/criar')
+      .loginAs(bibliotecario)
+      .form({ ...dadosAluno, anoEscolar: 0 })
+
+    const errosAbaixo = abaixoDoMinimo.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(errosAbaixo.anoEscolar, 'Ano escolar deve ser no mínimo 1.')
+
+    const acimaDoMaximo = await client
+      .post('/alunos')
+      .withCsrfToken()
+      .redirects(0)
+      .header('referer', '/alunos/criar')
+      .loginAs(bibliotecario)
+      .form({ ...dadosAluno, anoEscolar: 10 })
+
+    const errosAcima = acimaDoMaximo.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(errosAcima.anoEscolar, 'Ano escolar deve ser no máximo 9.')
     assert.lengthOf(await Aluno.all(), 0)
   })
 
@@ -201,7 +271,9 @@ test.group('AlunoController | cadastro', (group) => {
       .form({ ...dadosAluno, nome: 'Outro Nome' })
 
     response.assertStatus(302)
-    assert.property(response.flashMessage('inputErrorsBag'), 'matricula')
+
+    const erros = response.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(erros.matricula, 'Esta matrícula já está cadastrada.')
     assert.lengthOf(await Aluno.all(), 1)
   })
 
@@ -217,7 +289,9 @@ test.group('AlunoController | cadastro', (group) => {
       .form({ ...dadosAluno, nivel: 'superior' })
 
     response.assertStatus(302)
-    assert.property(response.flashMessage('inputErrorsBag'), 'nivel')
+
+    const erros = response.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(erros.nivel, 'Selecione uma opção válida para Nível.')
     assert.lengthOf(await Aluno.all(), 0)
   })
 
@@ -233,7 +307,9 @@ test.group('AlunoController | cadastro', (group) => {
       .form({ ...dadosAluno, email: 'nao-e-email' })
 
     response.assertStatus(302)
-    assert.property(response.flashMessage('inputErrorsBag'), 'email')
+
+    const erros = response.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(erros.email, 'Informe um e-mail válido.')
     assert.lengthOf(await Aluno.all(), 0)
   })
 
@@ -266,7 +342,9 @@ test.group('AlunoController | cadastro', (group) => {
       .form({ ...dadosAluno, nivel: 'medio', anoEscolar: 4 })
 
     response.assertStatus(302)
-    assert.property(response.flashMessage('inputErrorsBag'), 'anoEscolar')
+
+    const erros = response.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(erros.anoEscolar, 'O ano escolar do ensino médio não pode ser maior que 3')
     assert.lengthOf(await Aluno.all(), 0)
   })
 
