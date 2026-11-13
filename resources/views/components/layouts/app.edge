@@ -27,7 +27,6 @@
     <header class="bg-brand text-white">
       <div class="mx-auto flex max-w-6xl items-center justify-between gap-6 px-6 py-4">
         <a href="{{ route('home') }}" class="text-xl font-bold tracking-tight">Archivum</a>
-
         {{-- A navegação só faz sentido com um usuário autenticado; em páginas de erro (404/500) o auth não é compartilhado. --}}
         @if(auth?.user)
           <nav class="flex items-center gap-6">
