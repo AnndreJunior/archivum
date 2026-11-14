@@ -80,7 +80,10 @@ test.group('AutorController | cadastro', (group) => {
       .loginAs(bibliotecario)
 
     response.assertStatus(422)
-    assert.equal((response.body() as RespostaErros).errors[0].field, 'nome')
+
+    const erro = (response.body() as RespostaErros).errors[0]
+    assert.equal(erro.field, 'nome')
+    assert.equal(erro.message, 'Nome é obrigatório.')
     assert.lengthOf(await Autor.all(), 0)
   })
 
@@ -96,7 +99,10 @@ test.group('AutorController | cadastro', (group) => {
       .loginAs(bibliotecario)
 
     response.assertStatus(422)
-    assert.equal((response.body() as RespostaErros).errors[0].field, 'nome')
+
+    const erro = (response.body() as RespostaErros).errors[0]
+    assert.equal(erro.field, 'nome')
+    assert.equal(erro.message, 'Este nome já está cadastrado.')
     assert.lengthOf(await Autor.all(), 1)
   })
 
@@ -111,7 +117,10 @@ test.group('AutorController | cadastro', (group) => {
       .loginAs(bibliotecario)
 
     response.assertStatus(422)
-    assert.equal((response.body() as RespostaErros).errors[0].field, 'nome')
+
+    const erro = (response.body() as RespostaErros).errors[0]
+    assert.equal(erro.field, 'nome')
+    assert.equal(erro.message, 'Nome deve ter no máximo 120 caracteres.')
     assert.lengthOf(await Autor.all(), 0)
   })
 

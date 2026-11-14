@@ -332,9 +332,28 @@ test.group('ExemplarController | cadastro', (group) => {
 
     response.assertStatus(302)
 
-    const erros = response.flashMessage('inputErrorsBag')
-    assert.property(erros, 'livroId')
-    assert.property(erros, 'codigo')
+    const erros = response.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(erros.livroId, 'Livro é obrigatório.')
+    assert.include(erros.codigo, 'Código é obrigatório.')
+    assert.lengthOf(await Exemplar.all(), 0)
+  })
+
+  test('rejeita livro ou código enviados em branco', async ({ assert, client }) => {
+    const bibliotecario = await criarBibliotecario()
+
+    const response = await client
+      .post('/exemplares')
+      .withCsrfToken()
+      .redirects(0)
+      .header('referer', '/exemplares/criar')
+      .loginAs(bibliotecario)
+      .form({ livroId: 0, codigo: '   ' })
+
+    response.assertStatus(302)
+
+    const erros = response.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(erros.livroId, 'Selecione um livro.')
+    assert.include(erros.codigo, 'Código é obrigatório.')
     assert.lengthOf(await Exemplar.all(), 0)
   })
 
@@ -350,7 +369,9 @@ test.group('ExemplarController | cadastro', (group) => {
       .form({ livroId: 999999, ...dadosExemplar })
 
     response.assertStatus(302)
-    assert.property(response.flashMessage('inputErrorsBag'), 'livroId')
+
+    const erros = response.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(erros.livroId, 'O livro selecionado não existe.')
     assert.lengthOf(await Exemplar.all(), 0)
   })
 
@@ -386,7 +407,9 @@ test.group('ExemplarController | cadastro', (group) => {
       .form({ livroId: livro.id, codigo: 'EX-0001', situacao: 'perdido' })
 
     response.assertStatus(302)
-    assert.property(response.flashMessage('inputErrorsBag'), 'situacao')
+
+    const erros = response.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(erros.situacao, 'Selecione uma opção válida para Situação.')
     assert.lengthOf(await Exemplar.all(), 0)
   })
 })

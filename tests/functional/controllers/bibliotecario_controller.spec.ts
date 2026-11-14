@@ -298,11 +298,29 @@ test.group('BibliotecarioController | cadastro', (group) => {
 
     response.assertStatus(302)
 
-    const erros = response.flashMessage('inputErrorsBag')
-    assert.property(erros, 'nome')
-    assert.property(erros, 'matricula')
-    assert.property(erros, 'email')
-    assert.property(erros, 'role')
+    const erros = response.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(erros.nome, 'Nome é obrigatório.')
+    assert.include(erros.matricula, 'Matrícula é obrigatório.')
+    assert.include(erros.email, 'E-mail é obrigatório.')
+    assert.include(erros.role, 'Perfil é obrigatório.')
+    assert.lengthOf(await Bibliotecario.all(), 1)
+  })
+
+  test('rejeita nome em branco', async ({ assert, client }) => {
+    const admin = await criarAdmin()
+
+    const response = await client
+      .post('/bibliotecarios')
+      .withCsrfToken()
+      .redirects(0)
+      .header('referer', '/bibliotecarios/criar')
+      .loginAs(admin)
+      .form({ ...dadosFormulario, nome: '   ' })
+
+    response.assertStatus(302)
+
+    const erros = response.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(erros.nome, 'Nome é obrigatório.')
     assert.lengthOf(await Bibliotecario.all(), 1)
   })
 
@@ -318,7 +336,9 @@ test.group('BibliotecarioController | cadastro', (group) => {
       .form({ ...dadosFormulario, role: 'superadmin' })
 
     response.assertStatus(302)
-    assert.property(response.flashMessage('inputErrorsBag'), 'role')
+
+    const erros = response.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(erros.role, 'Selecione uma opção válida para Perfil.')
     assert.lengthOf(await Bibliotecario.all(), 1)
   })
 
@@ -334,7 +354,9 @@ test.group('BibliotecarioController | cadastro', (group) => {
       .form({ ...dadosFormulario, matricula: 'BIB01' })
 
     response.assertStatus(302)
-    assert.property(response.flashMessage('inputErrorsBag'), 'matricula')
+
+    const erros = response.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(erros.matricula, 'Matrícula deve ter exatamente 6 caracteres.')
     assert.lengthOf(await Bibliotecario.all(), 1)
   })
 
@@ -351,7 +373,9 @@ test.group('BibliotecarioController | cadastro', (group) => {
       .form({ ...dadosFormulario, matricula: dadosBibliotecario.matricula })
 
     response.assertStatus(302)
-    assert.property(response.flashMessage('inputErrorsBag'), 'matricula')
+
+    const erros = response.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(erros.matricula, 'Esta matrícula já está cadastrada.')
   })
 
   test('rejeita e-mail já cadastrado', async ({ assert, client }) => {
@@ -367,7 +391,27 @@ test.group('BibliotecarioController | cadastro', (group) => {
       .form({ ...dadosFormulario, email: dadosBibliotecario.email })
 
     response.assertStatus(302)
-    assert.property(response.flashMessage('inputErrorsBag'), 'email')
+
+    const erros = response.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(erros.email, 'Este e-mail já está cadastrado.')
+  })
+
+  test('rejeita e-mail inválido', async ({ assert, client }) => {
+    const admin = await criarAdmin()
+
+    const response = await client
+      .post('/bibliotecarios')
+      .withCsrfToken()
+      .redirects(0)
+      .header('referer', '/bibliotecarios/criar')
+      .loginAs(admin)
+      .form({ ...dadosFormulario, email: 'nao-e-email' })
+
+    response.assertStatus(302)
+
+    const erros = response.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(erros.email, 'Informe um e-mail válido.')
+    assert.lengthOf(await Bibliotecario.all(), 1)
   })
 
   test('ignora a senha enviada no formulário', async ({ assert, client }) => {

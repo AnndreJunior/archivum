@@ -104,7 +104,9 @@ test.group('RecuperacaoSenhaController | envio do link', (group) => {
       .form({ email: 'nao-e-email' })
 
     response.assertStatus(302)
-    assert.property(response.flashMessage('inputErrorsBag'), 'email')
+
+    const erros = response.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(erros.email, 'Informe um e-mail válido.')
   })
 })
 
@@ -183,6 +185,62 @@ test.group('RecuperacaoSenhaController | troca da senha', (group) => {
       .form({ token, senha: 'nova-senha-123', senhaConfirmation: 'diferente-123' })
 
     response.assertStatus(302)
-    assert.property(response.flashMessage('inputErrorsBag'), 'senhaConfirmation')
+
+    const erros = response.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(erros.senhaConfirmation, 'A confirmação de senha não confere.')
+  })
+
+  test('rejeita senha em branco', async ({ assert, client }) => {
+    const bibliotecario = await criarBibliotecario()
+    const token = await gerarToken(bibliotecario)
+
+    const response = await client
+      .post('/auth/trocar-senha')
+      .withCsrfToken()
+      .redirects(0)
+      .header('referer', `/auth/trocar-senha?token=${token}`)
+      .form({ token, senha: '   ', senhaConfirmation: '   ' })
+
+    response.assertStatus(302)
+
+    const erros = response.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(erros.senha, 'Informe sua senha.')
+    assert.notProperty(erros, 'senhaConfirmation')
+  })
+
+  test('rejeita confirmação em branco quando a senha foi informada', async ({ assert, client }) => {
+    const bibliotecario = await criarBibliotecario()
+    const token = await gerarToken(bibliotecario)
+
+    const response = await client
+      .post('/auth/trocar-senha')
+      .withCsrfToken()
+      .redirects(0)
+      .header('referer', `/auth/trocar-senha?token=${token}`)
+      .form({ token, senha: 'nova-senha-123', senhaConfirmation: '   ' })
+
+    response.assertStatus(302)
+
+    const erros = response.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(erros.senhaConfirmation, 'A confirmação de senha não confere.')
+    assert.notInclude(erros.senhaConfirmation, 'Confirmação de senha é obrigatório.')
+  })
+
+  test('rejeita senha menor que 8 caracteres', async ({ assert, client }) => {
+    const bibliotecario = await criarBibliotecario()
+    const token = await gerarToken(bibliotecario)
+
+    const response = await client
+      .post('/auth/trocar-senha')
+      .withCsrfToken()
+      .redirects(0)
+      .header('referer', `/auth/trocar-senha?token=${token}`)
+      .form({ token, senha: 'curta', senhaConfirmation: 'curta' })
+
+    response.assertStatus(302)
+
+    const erros = response.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(erros.senha, 'A senha deve ter pelo menos 8 caracteres.')
+    assert.notProperty(erros, 'senhaConfirmation')
   })
 })

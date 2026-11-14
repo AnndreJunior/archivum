@@ -34,7 +34,6 @@
           name="titulo"
           value="{{ old('titulo', livro ? livro.titulo : '') }}"
           maxlength="200"
-          required
           autofocus
           class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/30"
         />
@@ -95,8 +94,6 @@
           id="anoPublicacao"
           name="anoPublicacao"
           value="{{ old('anoPublicacao', livro ? (livro.anoPublicacao ?? '') : '') }}"
-          min="1"
-          max="9999"
           class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/30"
         />
         @inputError('anoPublicacao')
@@ -288,7 +285,6 @@
                   x-model="novoNome"
                   x-ref="nomeAutor"
                   maxlength="120"
-                  required
                   class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/30"
                 />
                 <template x-for="erro in (errosAutor.nome ?? [])" :key="erro">

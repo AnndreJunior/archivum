@@ -75,8 +75,43 @@ test.group('AuthController | login e logout', (group) => {
       .form({ email: 'nao-e-email', senha: 'x' })
 
     response.assertStatus(302)
-    assert.property(response.flashMessage('inputErrorsBag'), 'email')
+
+    const erros = response.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(erros.email, 'Informe um e-mail válido.')
     response.assertSessionMissing('auth_web')
+  })
+
+  test('rejeita login com campos em branco', async ({ assert, client }) => {
+    const response = await client
+      .post('/auth/login')
+      .withCsrfToken()
+      .redirects(0)
+      .header('referer', '/auth/login')
+      .form({ email: '   ', senha: '   ' })
+
+    response.assertStatus(302)
+
+    const erros = response.flashMessage('inputErrorsBag') as Record<string, string[]>
+    assert.include(erros.email, 'Informe um e-mail válido.')
+    assert.include(erros.senha, 'Informe sua senha.')
+    response.assertSessionMissing('auth_web')
+  })
+
+  test('não exige senha com tamanho mínimo no login', async ({ assert, client }) => {
+    await criarBibliotecario()
+
+    const response = await client
+      .post('/auth/login')
+      .withCsrfToken()
+      .redirects(0)
+      .header('referer', '/auth/login')
+      .form({ email: dadosBibliotecario.email, senha: 'curta' })
+
+    response.assertStatus(302)
+    response.assertHeader('location', '/auth/login')
+    response.assertFlashMessage('loginError', 'Credenciais inválidas')
+    response.assertSessionMissing('auth_web')
+    assert.notProperty(response.flashMessage('inputErrorsBag') ?? {}, 'senha')
   })
 
   test('encerra a sessão e redireciona para o login', async ({ client }) => {

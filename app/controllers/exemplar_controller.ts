@@ -1,11 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Livro from '#models/livro'
 import Exemplar from '#models/exemplar'
-import {
-  atualizarExemplarValidator,
-  criarExemplarValidator,
-  mensagensExemplar,
-} from '#validators/exemplar'
+import { atualizarExemplarValidator, criarExemplarValidator } from '#validators/exemplar'
 
 /**
  * Quantidade de exemplares exibida por página na listagem.
@@ -64,9 +60,7 @@ export default class ExemplarController {
    * Cadastra um novo exemplar.
    */
   async store({ request, response, session }: HttpContext) {
-    const dados = await request.validateUsing(criarExemplarValidator, {
-      messagesProvider: mensagensExemplar,
-    })
+    const dados = await request.validateUsing(criarExemplarValidator)
 
     await Exemplar.create(dados)
 
@@ -94,7 +88,6 @@ export default class ExemplarController {
 
     const dados = await request.validateUsing(atualizarExemplarValidator, {
       meta: { id: exemplar.id },
-      messagesProvider: mensagensExemplar,
     })
 
     exemplar.merge(dados)

@@ -3,6 +3,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import AuthService from '#services/auth_service'
 import CredenciaisInvalidasException from '#exceptions/credenciais_invalidas_exception'
 import { loginValidator } from '#validators/bibliotecario'
+import { mensagensLogin } from '#validators/mensagens'
 
 /**
  * Autenticação de bibliotecários: login e logout.
@@ -25,7 +26,9 @@ export default class AuthController {
    * login com uma mensagem de erro.
    */
   async login({ request, response, auth, session }: HttpContext) {
-    const { email, senha } = await request.validateUsing(loginValidator)
+    const { email, senha } = await request.validateUsing(loginValidator, {
+      messagesProvider: mensagensLogin,
+    })
 
     try {
       const bibliotecario = await this.authService.verificarCredenciais({ email, senha })
