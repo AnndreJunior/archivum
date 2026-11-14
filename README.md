@@ -15,7 +15,7 @@ Credenciais de acesso (ambiente de demonstração, apenas para testes):
 | E-mail | `admin@archivum.local` |
 | Senha  | `adminarchivum123`     |
 
-> Os dados são apenas de demonstração e podem ser reiniciados a qualquer momento.
+> Os dados são apenas de demonstração e podem ser reiniciados a qualquer momento. Nesta demo nenhuma integração com um serviço de e-mails foi configurado. Para experimentar todas as funcionalidades do Archivum, execute-o localmente. Para mais detalhes veja [como executar localmente](#como-executar).
 
 ## Tecnologias
 
