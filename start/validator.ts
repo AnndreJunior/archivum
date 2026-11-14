@@ -12,7 +12,9 @@
 */
 
 import { DateTime } from 'luxon'
+import { RequestValidator } from '@adonisjs/core/http'
 import { VineDate } from '@vinejs/vine'
+import { mensagensProvider } from '#validators/mensagens'
 
 declare module '@vinejs/vine/types' {
   interface VineGlobalTransforms {
@@ -21,3 +23,8 @@ declare module '@vinejs/vine/types' {
 }
 
 VineDate.transform((value) => DateTime.fromJSDate(value))
+
+/**
+ * Mensagens de validação em português aplicadas a todas as requisições.
+ */
+RequestValidator.messagesProvider = () => mensagensProvider

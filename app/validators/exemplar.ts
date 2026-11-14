@@ -1,12 +1,5 @@
-import vine, { SimpleMessagesProvider } from '@vinejs/vine'
+import vine from '@vinejs/vine'
 import Exemplar from '#models/exemplar'
-
-/**
- * Mensagens em português usadas nos formulários de exemplares.
- */
-export const mensagensExemplar = new SimpleMessagesProvider({
-  'codigo.database.unique': 'Este código já está cadastrado.',
-})
 
 /**
  * Validação dos dados de exemplares.

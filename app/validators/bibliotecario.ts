@@ -10,9 +10,26 @@ const senha = () => vine.string().minLength(8).maxLength(32)
 /**
  * Regras comuns aos formulários de bibliotecário.
  */
-const nome = () => vine.string().trim().maxLength(120)
+const nome = () => vine.string().trim().minLength(1).maxLength(120)
 const matricula = () => vine.string().trim().fixedLength(6)
 const role = () => vine.enum(Bibliotecario.roles)
+
+/**
+ * Confirmação de senha: valida apenas a igualdade com o campo `senha`, sem
+ * exigir preenchimento nem tamanho mínimo. A regra é implícita para também
+ * rodar quando o campo chega nulo (o bodyparser converte espaços em branco
+ * em `null`).
+ */
+const senhasIguais = vine.createRule(
+  (value, _options, field) => {
+    if (value !== field.data.senha) {
+      field.report('A confirmação de senha não confere.', 'sameAs', field)
+    }
+  },
+  { implicit: true }
+)
+
+const senhaConfirmation = () => vine.string().optional().use(senhasIguais())
 
 /**
  * Validador usado no cadastro de bibliotecários.
@@ -56,11 +73,11 @@ export const atualizarBibliotecarioValidator = vine.create({
  * Validador usado no cadastro de bibliotecários.
  */
 export const signupValidator = vine.create({
-  nome: vine.string().maxLength(120),
+  nome: nome(),
   matricula: vine.string().fixedLength(6).unique({ table: 'bibliotecario', column: 'matricula' }),
   email: email().unique({ table: 'bibliotecario', column: 'email' }),
   senha: senha(),
-  senhaConfirmation: senha().sameAs('senha'),
+  senhaConfirmation: senhaConfirmation(),
 })
 
 /**
@@ -84,5 +101,5 @@ export const esqueciSenhaValidator = vine.create({
 export const trocarSenhaValidator = vine.create({
   token: vine.string(),
   senha: senha(),
-  senhaConfirmation: senha().sameAs('senha'),
+  senhaConfirmation: senhaConfirmation(),
 })

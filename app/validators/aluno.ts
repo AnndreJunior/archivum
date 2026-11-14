@@ -31,12 +31,13 @@ const anoEscolarCompativelComNivel = vine.createRule((value, _options, field) =>
   }
 })
 
-const nome = () => vine.string().trim().maxLength(120)
+const nome = () => vine.string().trim().minLength(1).maxLength(120)
 const anoEscolar = () => vine.number().min(1).max(9).use(anoEscolarCompativelComNivel())
 const turma = () =>
   vine
     .string()
     .trim()
+    .minLength(1)
     .maxLength(1)
     .transform((value) => value.toUpperCase())
 const nivel = () => vine.enum(Aluno.niveis)
@@ -46,7 +47,12 @@ const nivel = () => vine.enum(Aluno.niveis)
  */
 export const criarAlunoValidator = vine.create({
   nome: nome(),
-  matricula: vine.string().trim().maxLength(20).unique({ table: 'aluno', column: 'matricula' }),
+  matricula: vine
+    .string()
+    .trim()
+    .minLength(1)
+    .maxLength(20)
+    .unique({ table: 'aluno', column: 'matricula' }),
   anoEscolar: anoEscolar(),
   turma: turma(),
   nivel: nivel(),
@@ -65,6 +71,7 @@ export const atualizarAlunoValidator = vine.create({
   matricula: vine
     .string()
     .trim()
+    .minLength(1)
     .maxLength(20)
     .unique({
       table: 'aluno',
