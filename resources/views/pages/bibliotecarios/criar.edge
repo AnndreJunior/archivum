@@ -5,6 +5,15 @@
       Cadastre um usuário que poderá operar o sistema da biblioteca.
     </p>
 
+    @flashMessage('sucesso')
+      <div
+        class="mt-6 flex items-start gap-3 rounded-md border border-green-200 bg-green-50 p-3 text-sm text-green-700"
+      >
+        @svg('lucide:circle-check', { class: 'mt-0.5 h-4 w-4 shrink-0' })
+        <span>{{ $message }}</span>
+      </div>
+    @end
+
     <div
       class="mt-4 flex items-start gap-3 rounded-md border border-blue-200 bg-blue-50 p-3 text-sm text-blue-700"
     >
