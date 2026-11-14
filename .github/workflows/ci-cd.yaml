@@ -1,11 +1,12 @@
-name: CD
+name: CI/CD Pipeline
 
 on:
   push:
     branches: [main]
+  pull_request:
   workflow_dispatch:
 
-# Evita dois deploys simultâneos para o mesmo ambiente.
+# Evita dois deploys simultâneos para o mesmo ambiente sem cancelar PRs em andamento.
 concurrency:
   group: cd-${{ github.ref }}
   cancel-in-progress: false
@@ -14,9 +15,72 @@ permissions:
   contents: read
 
 jobs:
-  migrations:
-    name: Aplicar migrations pendentes
+  ci:
+    name: CI - Qualidade e Testes
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      CI: true
+      TZ: UTC
+      HOST: localhost
+      PORT: 3333
+      LOG_LEVEL: info
+      APP_KEY: ci-only-archivum-app-key-0123456
+      APP_URL: http://localhost:3333
+      SESSION_DRIVER: memory
+      ADMIN_NOME: Administrador do Sistema
+      ADMIN_MATRICULA: ADM001
+      ADMIN_EMAIL: admin@archivum.test
+      ADMIN_SENHA: admin-test-123
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_USER: archivum
+      DB_PASSWORD: archivum
+      DB_DATABASE: archivum_test
+      MAIL_MAILER: smtp
+      MAIL_FROM_NAME: Archivum
+      MAIL_FROM_ADDRESS: noreply@archivum.test
+      SMTP_HOST: localhost
+      SMTP_PORT: 2525
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ vars.NODE_VERSION }}
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Verificar formatação
+        run: npx --no-install prettier --check .
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Testes
+        run: npm test
+        env:
+          NODE_ENV: test
+
+  migrations:
+    name: CD - Aplicar migrations
+    runs-on: ubuntu-latest
+    needs: [ci]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     timeout-minutes: 15
 
     # As variáveis de banco vêm dos secrets do repositório. As demais são apenas
@@ -68,8 +132,9 @@ jobs:
           fi
 
   docker:
-    name: Publicar imagem no Docker Hub
+    name: CD - Publicar imagem Docker
     runs-on: ubuntu-latest
+    needs: [migrations]
     timeout-minutes: 30
 
     steps:
@@ -98,10 +163,10 @@ jobs:
           cache-to: type=gha,mode=max
 
   deploy:
-    name: Deploy no Render
+    name: CD - Deploy no Render
     runs-on: ubuntu-latest
+    needs: [docker]
     timeout-minutes: 10
-    needs: [migrations, docker]
 
     steps:
       - name: Disparar deploy no Render
