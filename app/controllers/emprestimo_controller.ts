@@ -19,6 +19,17 @@ const POR_PAGINA = 15
 const FILTROS_STATUS = ['ativo', 'devolvido', 'vencido'] as const
 
 /**
+ * Mapa de filtros da listagem: cada situação aceita recebe a consulta de
+ * empréstimos e aplica o recorte correspondente. As chaves são derivadas de
+ * `FILTROS_STATUS`, então adicionar ou remover um status exige atualizar os
+ * dois lados.
+ */
+type FiltrosPelosStatus = Record<
+  (typeof FILTROS_STATUS)[number],
+  (consulta: ReturnType<typeof Emprestimo.query>) => void
+>
+
+/**
  * Erros de negócio cuja mensagem pode ser exibida diretamente ao usuário.
  * Funciona como allowlist: qualquer outro erro continua subindo para o
  * handler global.
@@ -73,11 +84,11 @@ export default class EmprestimoController {
         })
       })
 
-    const filtrosPelosStatus = {
-      ativo: (q: typeof query) => q.where('status', 'ativo'),
-      devolvido: (q: typeof query) => q.where('status', 'devolvido'),
-      vencido: (q: typeof query) =>
-        q
+    const filtrosPelosStatus: FiltrosPelosStatus = {
+      ativo: (consulta) => consulta.where('status', 'ativo'),
+      devolvido: (consulta) => consulta.where('status', 'devolvido'),
+      vencido: (consulta) =>
+        consulta
           .where('status', 'ativo')
           .whereNull('dataDevolucao')
           .where('dataPrevistaDevolucao', '<', hoje.toISODate()),
