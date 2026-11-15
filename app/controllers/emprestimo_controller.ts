@@ -73,15 +73,18 @@ export default class EmprestimoController {
         })
       })
 
-    if (status === 'ativo') {
-      query.where('status', 'ativo')
-    } else if (status === 'devolvido') {
-      query.where('status', 'devolvido')
-    } else if (status === 'vencido') {
-      query
-        .where('status', 'ativo')
-        .whereNull('dataDevolucao')
-        .where('dataPrevistaDevolucao', '<', hoje.toISODate())
+    const filtrosPelosStatus = {
+      ativo: (q: typeof query) => q.where('status', 'ativo'),
+      devolvido: (q: typeof query) => q.where('status', 'devolvido'),
+      vencido: (q: typeof query) =>
+        q
+          .where('status', 'ativo')
+          .whereNull('dataDevolucao')
+          .where('dataPrevistaDevolucao', '<', hoje.toISODate()),
+    }
+
+    if (status && status in filtrosPelosStatus) {
+      filtrosPelosStatus[status as keyof typeof filtrosPelosStatus](query)
     }
 
     const emprestimos = await query
